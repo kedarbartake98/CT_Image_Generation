@@ -1,0 +1,13 @@
+
+.ipynb_checkpoints/Solve PCA-checkpoint.ipynb
+*.pyc
+*.txt
+*.ipynb
+*.zip
+*.DS_Store
+*.mat
+data/pgnn/pgnn/main.py
+data/pgnn/pgnn/man.py
+data/pgnn/pgnn/models/Untitled document.docx
+data/pgnn/pgnn/models/graphcnn.py
+data/pgnn/pgnn/models/graphcnnactorcritic.py

@@ -227,8 +227,8 @@ class PCA_rep:
 
     def get_img_from_sample(self, sample):
 
-        gen_sample = self.generate_other_organs(sample)
-        sample_curves = self.sample_to_curves(gen_sample)
+        # gen_sample = self.generate_other_organs(sample)
+        sample_curves = self.sample_to_curves(sample)
 
         img = self.get_image(sample_curves)
 
@@ -239,7 +239,7 @@ class PCA_rep:
 
         while isinstance(img, str):
             sample = self.generate_sample()
-            img = self.get_img_from_sample(sample['Torso'])
+            img = self.get_img_from_sample(sample)
             print('Retrying ...')
         
         return img, sample

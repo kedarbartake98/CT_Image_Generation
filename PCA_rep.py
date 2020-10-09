@@ -38,7 +38,6 @@ class PCA_rep:
     def __init__(self, config):
 
         self.df = read_data(config)
-        # print(self.df)
         self.organs = config.ORGANS
         self.components = config.COMPONENTS
         self.co_in, self.co_in123, self.co_in45 = get_graph()
@@ -65,7 +64,6 @@ class PCA_rep:
         for organ in self.organs:
 
             coord_list = self.df[organ].dropna().tolist()
-            # print('***', coord_list)
             coord_list = [np.array([float((int(x)-255.5)/255.5) 
                          for x in curve.split()]) 
                          for curve in coord_list]
@@ -227,7 +225,6 @@ class PCA_rep:
 
     def get_img_from_sample(self, sample):
 
-        # gen_sample = self.generate_other_organs(sample)
         sample_curves = self.sample_to_curves(sample)
 
         img = self.get_image(sample_curves)

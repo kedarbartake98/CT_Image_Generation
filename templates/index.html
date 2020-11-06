@@ -19,30 +19,73 @@
 
   <body>
     
-    <div class="container">
-      <div class="row h+100">
-        <div class="col bg-success">
-          <img id="source" class="rounded mx-auto d-block" alt="..." style="width:100%">
+    <div class="container-fluid">
+      <div class="row" height=300px>
+        <div class="col-1" style="height: 300px"></div>
+
+        <div class="col-3">
+          <img id="source" class="rounded mx-auto d-block" alt="..." width="300" height="300" style="width:300px height=300px">
         </div>
-        <div class="col bg-warning">
-            <img id="interpolated" class="rounded mx-auto d-block" alt="..." style="width:100%">
+
+        <div class="col-1" style="height: 100%"></div>
+
+        <div class="col-3">
+          <img id="interpolated" class="rounded mx-auto d-block" alt="..." width="300" height="300" style="width:300px height=300px">
         </div>
-        <div class="col bg-success">
-          <img id="dest" class="rounded mx-auto d-block" alt="..." style="width:100%">
+
+        <div class="col-1" style="height: 100%"></div>
+
+        <div class="col-3">
+          <img id="dest" class="rounded mx-auto d-block" alt="..." width="300" height="300" style="width:300px height=300px">
         </div>
+
+        <div class="col-1" style="height: 100%"></div>
       </div>
-      <div class="row">
 
-        <div class="col bg-warning">
-
+      <div class="row" height="20px">
         <div class="col bg-success">
           <div class="slidecontainer">
             <input type="range" min="0" max="100" value="0" class="slider" id="slider"><br><br>
             <button type="button" class="btn btn-primary" id="generate" onclick="generate()">Generate new pair</button>
+          </div>    
         </div>
-        </div>
-        <div class="col bg-warning">
       </div>
+
+      <div class="row" height=200px>
+        <div class="col-3">
+          <img id="image_01" class="rounded mx-auto d-block" alt="..." width="200" height="200" style="width:200px height=200px">
+        </div>
+
+        <div class="col-3">
+          <img id="image_02" class="rounded mx-auto d-block" alt="..." width="200" height="200" style="width:200px height=200px">
+        </div>
+
+        <div class="col-3">
+          <img id="image_03" class="rounded mx-auto d-block" alt="..." width="200" height="200" style="width:200px height=200px">
+        </div>
+
+        <div class="col-3">
+            <img id="image_04" class="rounded mx-auto d-block" alt="..." width="200" height="200" style="width:200px height=200px">
+        </div>
+      </div> 
+
+      <div class="row" height=200px>
+        <div class="col-3">
+          <img id="image_11" class="rounded mx-auto d-block" alt="..." width="200" height="200" style="width:200px height=200px">
+        </div>
+
+        <div class="col-3">
+          <img id="image_12" class="rounded mx-auto d-block" alt="..." width="200" height="200" style="width:200px height=200px">
+        </div>
+
+        <div class="col-3">
+          <img id="image_13" class="rounded mx-auto d-block" alt="..." width="200" height="200" style="width:200px height=200px">
+        </div>
+
+        <div class="col-3">
+          <img id="image_14" class="rounded mx-auto d-block" alt="..." width="200" height="200" style="width:200px height=200px">
+        </div>
+      </div> 
     </div>
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->

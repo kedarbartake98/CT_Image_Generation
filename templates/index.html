@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>PCA based Image interpolation</title>
+    <!-- <title>PCA based Image interpolation</title> -->
 
     <!-- Bootstrap -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
@@ -18,347 +18,68 @@
   </head>
 
   <body>
-    
-    <div class="container-fluid">
-      <div class="row" height=300px>
-        <div class="col-1" style="height: 300px"></div>
+ <div class="container-fluid">
+     <div class="row">
+         <!--<span class="border">-->
+         <div class='col-6'>
+             <!-- Title row -->
+             <div class='row'>
+                 <div class='col-3'>
+                     <button type="button" class="btn btn-primary btn-block">File</button>
+                 </div>
+                 <div class="col-2" style="background-color:gray;"></div>
+                 <div class='col-5' style="background-color:gray;"> Sample Generation </div>
+                 <div class="col-2" style="background-color:gray;"></div>
+             </div>
+             <div class='row'>
+                 <div class='col-2'>
+                     <div class="row">
+                         <button type="button" class="btn btn-primary btn-block">Init</button>
+                     </div>
+                     <div class="row">
+                         <button type="button" class="btn btn-primary btn-block">Generate New Pair</button>
+                     </div>
+                 </div>
+                 <div class='col-1'></div>
 
-        <div class="col-3">
-          <img id="source" class="rounded mx-auto d-block" alt="..." width="300" height="300" style="width:300px height=300px">
-          <label for="source">Source Image</label>
-        </div>
+                 <div class='col-3'>
+                  <img id="source" class="rounded mx-auto d-block" alt="..." width="300" height="300" style="width:300px height=300px">
+                 </div>
 
-        <div class="col-1" style="height: 100%"></div>
+                 <div class='col-3'> 
+                  <img id="source" class="rounded mx-auto d-block" alt="..." width="300" height="300" style="width:300px height=300px">
+                 </div>
 
-        <div class="col-3">
-          <img id="interpolated" class="rounded mx-auto d-block" alt="..." width="300" height="300" style="width:300px height=300px">
-          <label for="interpolated">Interpolated Image</label>
-        </div>
-
-        <div class="col-1" style="height: 100%"></div>
-
-        <div class="col-3">
-          <img id="dest" class="rounded mx-auto d-block" alt="..." width="300" height="300" style="width:300px height=300px">
-          <label for="dest">Destination Image</label>
-        </div>
-
-        <div class="col-1" style="height: 100%"></div>
-      </div>
-
-      <div class="row" height="20px">
-        <div class="col bg-success">
-          <div class="slidecontainer">
-            <input type="range" min="0" max="100" value="0" class="slider" id="slider"><br><br>
-            <button type="button" class="btn btn-primary" id="generate" onclick="generate()">Generate new pair</button>
-          </div>    
-        </div>
-      </div>
-
-      <div class="row" height=200px>
-
-        <div class="col-3 bg-success">
-          <div class="row">
-            <div class="col">
-              <img id="image_01" class="rounded mx-auto d-block" alt="..." width="200" height="200" style="width:200px height=200px">
-            </div>
-
-            <div class="col">
-              <div class="row">
-                <input type="checkbox" name="good" id="chb1">
-                <label for="chb1">Better than Interpolation</label>
-              </div>
-              <div class="row">
-                <input type="checkbox" name="good" id="chb2">
-                <label for="chb2">Worse than Interpolation</label>
-              </div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col">
-              <button type="button" class="btn btn-primary">Torso</button>        
-            </div>
-
-            <div class="col">
-              <button type="button" class="btn btn-primary">Lungs</button>        
-            </div>
-
-            <div class="col">
-              <button type="button" class="btn btn-primary">Heart</button>        
-            </div>
-
-            <div class="col">
-              <button type="button" class="btn btn-primary">Spine</button>        
-            </div>
-          </div>
-
-        </div>
-
-        <div class="col-3 bg-warning">
-          <div class="row">
-            <div class="col">
-              <img id="image_02" class="rounded mx-auto d-block" alt="..." width="200" height="200" style="width:200px height=200px">
-            </div>
-
-            <div class="col">
-              <div class="row">
-                <input type="checkbox" name="good" id="chb1">
-                <label for="chb1">Better than Interpolation</label>
-              </div>
-              <div class="row">
-                <input type="checkbox" name="good" id="chb2">
-                <label for="chb2">Worse than Interpolation</label>
-              </div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col">
-              <button type="button" class="btn btn-primary">Torso</button>        
-            </div>
-
-            <div class="col">
-              <button type="button" class="btn btn-primary">Lungs</button>        
-            </div>
-
-            <div class="col">
-              <button type="button" class="btn btn-primary">Heart</button>        
-            </div>
-
-            <div class="col">
-              <button type="button" class="btn btn-primary">Spine</button>        
-            </div>
-          </div>
-
-        </div>
-
-        <div class="col-3 bg-success">
-          <div class="row">
-            <div class="col">
-              <img id="image_03" class="rounded mx-auto d-block" alt="..." width="200" height="200" style="width:200px height=200px">
-            </div>
-
-            <div class="col">
-              <div class="row">
-                <input type="checkbox" name="good" id="chb1">
-                <label for="chb1">Better than Interpolation</label>
-              </div>
-              <div class="row">
-                <input type="checkbox" name="good" id="chb2">
-                <label for="chb2">Worse than Interpolation</label>
-              </div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col">
-              <button type="button" class="btn btn-primary">Torso</button>        
-            </div>
-
-            <div class="col">
-              <button type="button" class="btn btn-primary">Lungs</button>        
-            </div>
-
-            <div class="col">
-              <button type="button" class="btn btn-primary">Heart</button>        
-            </div>
-
-            <div class="col">
-              <button type="button" class="btn btn-primary">Spine</button>        
-            </div>
-          </div>
-
-        </div>
-
-        <div class="col-3 bg-warning">
-          <div class="row">
-            <div class="col">
-              <img id="image_04" class="rounded mx-auto d-block" alt="..." width="200" height="200" style="width:200px height=200px">
-            </div>
-
-            <div class="col">
-              <div class="row">
-                <input type="checkbox" name="good" id="chb1">
-                <label for="chb1">Better than Interpolation</label>
-              </div>
-              <div class="row">
-                <input type="checkbox" name="good" id="chb2">
-                <label for="chb2">Worse than Interpolation</label>
-              </div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col">
-              <button type="button" class="btn btn-primary">Torso</button>        
-            </div>
-
-            <div class="col">
-              <button type="button" class="btn btn-primary">Lungs</button>        
-            </div>
-
-            <div class="col">
-              <button type="button" class="btn btn-primary">Heart</button>        
-            </div>
-
-            <div class="col">
-              <button type="button" class="btn btn-primary">Spine</button>        
-            </div>
-          </div>
-
-        </div>
-      </div> 
-
-      <div class="row" style="width:100% height=20px">
-       <img class="rounded mx-auto d-block" alt="..." width="20" height="20" style="width:20px height=20px">
-      </div>
-
-      <div class="row" height=200px>
-         <div class="col-3 bg-warning">
-          <div class="row">
-            <div class="col">
-              <img id="image_11" class="rounded mx-auto d-block" alt="..." width="200" height="200" style="width:200px height=200px">
-            </div>
-
-            <div class="col">
-              <div class="row">
-                <input type="checkbox" name="good" id="chb1">
-                <label for="chb1">Better than Interpolation</label>
-              </div>
-              <div class="row">
-                <input type="checkbox" name="good" id="chb2">
-                <label for="chb2">Worse than Interpolation</label>
-              </div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col">
-              <button type="button" class="btn btn-primary">Torso</button>        
-            </div>
-
-            <div class="col">
-              <button type="button" class="btn btn-primary">Lungs</button>        
-            </div>
-
-            <div class="col">
-              <button type="button" class="btn btn-primary">Heart</button>        
-            </div>
-
-            <div class="col">
-              <button type="button" class="btn btn-primary">Spine</button>        
-            </div>
-          </div>
-
-        </div>
-
-        <div class="col-3 bg-success">
-          <div class="row">
-            <div class="col">
-              <img id="image_12" class="rounded mx-auto d-block" alt="..." width="200" height="200" style="width:200px height=200px">
-            </div>
-
-            <div class="col">
-              <div class="row">
-                <input type="checkbox" name="good" id="chb1">
-                <label for="chb1">Better than Interpolation</label>
-              </div>
-              <div class="row">
-                <input type="checkbox" name="good" id="chb2">
-                <label for="chb2">Worse than Interpolation</label>
-              </div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col">
-              <button type="button" class="btn btn-primary">Torso</button>        
-            </div>
-
-            <div class="col">
-              <button type="button" class="btn btn-primary">Lungs</button>        
-            </div>
-
-            <div class="col">
-              <button type="button" class="btn btn-primary">Heart</button>        
-            </div>
-
-            <div class="col">
-              <button type="button" class="btn btn-primary">Spine</button>        
-            </div>
-          </div>
-
-        </div>
-
-        <div class="col-3 bg-warning">
-          <div class="row">
-            <div class="col">
-              <img id="image_13" class="rounded mx-auto d-block" alt="..." width="200" height="200" style="width:200px height=200px">
-            </div>
-
-            <div class="col">
-              <div class="row">
-                <input type="checkbox" name="good" id="chb1">
-                <label for="chb1">Better than Interpolation</label>
-              </div>
-              <div class="row">
-                <input type="checkbox" name="good" id="chb2">
-                <label for="chb2">Worse than Interpolation</label>
-              </div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col">
-              <button type="button" class="btn btn-primary">Torso</button>        
-            </div>
-
-            <div class="col">
-              <button type="button" class="btn btn-primary">Lungs</button>        
-            </div>
-
-            <div class="col">
-              <button type="button" class="btn btn-primary">Heart</button>        
-            </div>
-
-            <div class="col">
-              <button type="button" class="btn btn-primary">Spine</button>        
-            </div>
-          </div>
-
-        </div>
-
-        <div class="col-3 bg-success">
-          <div class="row">
-            <div class="col">
-              <img id="image_14" class="rounded mx-auto d-block" alt="..." width="200" height="200" style="width:200px height=200px">
-            </div>
-
-            <div class="col">
-              <div class="row">
-                <input type="checkbox" name="good" id="chb1">
-                <label for="chb1">Better than Interpolation</label>
-              </div>
-              <div class="row">
-                <input type="checkbox" name="good" id="chb2">
-                <label for="chb2">Worse than Interpolation</label>
-              </div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col">
-              <button type="button" class="btn btn-primary">Torso</button>        
-            </div>
-
-            <div class="col">
-              <button type="button" class="btn btn-primary">Lungs</button>        
-            </div>
-
-            <div class="col">
-              <button type="button" class="btn btn-primary">Heart</button>        
-            </div>
-
-            <div class="col">
-              <button type="button" class="btn btn-primary">Spine</button>        
-            </div>
-          </div>
-
-        </div>
-      </div> 
-    </div>
+                 <div class='col-3'> 
+                  <img id="source" class="rounded mx-auto d-block" alt="..." width="300" height="300" style="width:300px height=300px">
+                 </div>
+             </div>
+             <div class="row">slider row</div>
+         </div>
+         <!--</span>-->
+         <div class='col-3'>
+             <div class="row"> Sample Completion</div>
+             <div class="row">
+                 <div class="col-9">Realistic Image</div>
+                 <div class="col-3">
+                     <div class="row"> Tissue Button</div>
+                     <div class="row"> Pathology Button</div>
+                     <div class="row"></div>
+                     <div class="row">OK/Save Button</div>
+                 </div>
+             </div>
+         </div>
+         <div class='col-3'>
+             <div class="row">Database Statistics</div>
+             <div>Graphs</div>
+         </div>
+     </div>
+     <!-- First Row done -->
+     <div class="row">
+         <div class='col-2'> Generate Samples </div>
+         <div class='col-10'> Sample Grid </div>
+     </div>
+ </div>
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>

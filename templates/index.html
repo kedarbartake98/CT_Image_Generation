@@ -15,6 +15,45 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://d3js.org/d3.v4.js" charset="utf-8"></script>
 
+
+    <style>
+    .slidecontainer {
+    width: 100%;
+    }
+
+    .slider {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 25px;
+    background: #d3d3d3;
+    outline: none;
+    opacity: 0.7;
+    -webkit-transition: .2s;
+    transition: opacity .2s;
+    }
+
+    .slider:hover {
+    opacity: 1;
+    }
+
+    .slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 25px;
+    height: 25px;
+    background: #337AB7;
+    cursor: pointer;
+    }
+
+    .slider::-moz-range-thumb {
+    width: 25px;
+    height: 25px;
+    background: #337AB7;
+    cursor: pointer;
+    }
+      
+    </style>
+
   </head>
 
   <body>
@@ -23,60 +62,189 @@
          <!--<span class="border">-->
          <div class='col-6'>
              <!-- Title row -->
-             <div class='row'>
+             <div class='row mb-3'>
                  <div class='col-3'>
                      <button type="button" class="btn btn-primary btn-block">File</button>
                  </div>
-                 <div class="col-2" style="background-color:gray;"></div>
-                 <div class='col-5' style="background-color:gray;"> Sample Generation </div>
-                 <div class="col-2" style="background-color:gray;"></div>
+                 <div class='col' style="text-align:center; background-color:gray;"> Sample Generation </div>
              </div>
              <div class='row'>
-                 <div class='col-2'>
-                     <div class="row">
+                 <div class='col-3'>
+                     <div class="row mb-3">
                          <button type="button" class="btn btn-primary btn-block">Init</button>
                      </div>
+                     <div class='row'></div>
                      <div class="row">
                          <button type="button" class="btn btn-primary btn-block">Generate New Pair</button>
                      </div>
+
                  </div>
-                 <div class='col-1'></div>
 
                  <div class='col-3'>
-                  <img id="source" class="rounded mx-auto d-block" alt="..." width="300" height="300" style="width:300px height=300px">
+                  <img id="source" class="rounded mx-auto d-block" alt="..." width="200" height="200" style="width:200px height=200px">
                  </div>
 
                  <div class='col-3'> 
-                  <img id="source" class="rounded mx-auto d-block" alt="..." width="300" height="300" style="width:300px height=300px">
+                  <img id="source" class="rounded mx-auto d-block" alt="..." width="200" height="200" style="width:200px height=200px">
                  </div>
 
                  <div class='col-3'> 
-                  <img id="source" class="rounded mx-auto d-block" alt="..." width="300" height="300" style="width:300px height=300px">
+                  <img id="source" class="rounded mx-auto d-block" alt="..." width="200" height="200" style="width:200px height=200px">
                  </div>
              </div>
-             <div class="row">slider row</div>
+
+             <div class="row mb-3">
+                
+                <div class='col-3'>
+                  
+                  <div class="row">
+
+                     <div class="col">
+                       <button type="button" class="btn btn-primary btn-block"><</button>
+                     </div>
+
+                     <div class="col">
+                      <button type="button" class="btn btn-primary btn-block">></button>
+                     </div>
+                  </div>
+
+                </div>
+
+                <div class="col-9">
+                  
+                  <div class="row">
+                    <input type="range" min="1" max="100" value="0" class="slider" id="myRange">
+                  </div>
+                </div>
+
+             </div>
+             <!-- ENds -->
+
          </div>
          <!--</span>-->
          <div class='col-3'>
-             <div class="row"> Sample Completion</div>
-             <div class="row">
-                 <div class="col-9">Realistic Image</div>
+             
+             <div class="row mb-3"> 
+                <div class='col' style="text-align:center; background-color:gray;"> Sample Completion</div>
+             </div>
+
+             <div class="row mb-3">
+
+                 <div class="col-9">
+                   <img id="source" class="rounded mx-auto d-block" alt="..." width="300" height="300" style="width:300px height=300px">
+                 </div>
+
                  <div class="col-3">
-                     <div class="row"> Tissue Button</div>
-                     <div class="row"> Pathology Button</div>
-                     <div class="row"></div>
-                     <div class="row">OK/Save Button</div>
+                     
+                     <div class="row mb-1"> 
+                        <button type="button" class="btn btn-primary btn-block">Tissue</button>
+                     </div>
+
+                     <div class="row mb-3">
+                       <button type="button" class="btn btn-primary btn-block">Pathology</button>
+                     </div>
+                     
+                     <div class="row mb-6">
+                       <button type="button" class="btn btn-primary btn-block">OK/Save</button>
+                     </div>
                  </div>
              </div>
          </div>
          <div class='col-3'>
-             <div class="row">Database Statistics</div>
-             <div>Graphs</div>
+             <div class="row mb-3">
+                <div class='col' style="text-align:center; background-color:gray;"> Database Statistics </div>
+             </div>
+             <div class="row mb-3">Graphs</div>
          </div>
      </div>
      <!-- First Row done -->
      <div class="row">
-         <div class='col-2'> Generate Samples </div>
+         <div class='col-2'> 
+            
+            <div class="row mb-3">
+                <button type="button" class="btn btn-primary btn-block">Generate Samples</button>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-12" style="text-align:center; background-color:gray;">
+                    <div class="row">
+                        <div class="col">Select Instance</div>
+                        <div class="col">
+                               <button type="button" class="btn btn-primary btn-block"><</button>
+                             </div>
+
+                             <div class="col">
+                              <button type="button" class="btn btn-primary btn-block">></button>
+                             </div>     
+                        </div>
+                    </div>
+            </div>
+
+            <div class="row mb-3">
+
+                <div class="col-6">
+                    <button type="button" class="btn btn-primary btn-block">Accept</button>
+                </div>
+            
+                <div class="col-6">
+                    <button type="button" class="btn btn-danger btn-block">Reject</button>        
+                </div>
+
+            </div>
+
+            <div class="row mb-3" style="text-align:center; background-color:gray;">
+                <div class="col">
+                    <button type="button" class="btn btn-primary btn-block">All</button>
+                </div>
+                <div class="col">
+                    Components
+                </div>
+                <div class="col">
+                    <button type="button" class="btn btn-danger btn-block">All</button>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-6">
+                    <button type="button" class="btn btn-primary btn-block">Lung</button>
+                </div>
+            
+                <div class="col-6">
+                    <button type="button" class="btn btn-danger btn-block">Lung</button>        
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-6">
+                    <button type="button" class="btn btn-primary btn-block">Spine</button>
+                </div>
+            
+                <div class="col-6">
+                    <button type="button" class="btn btn-danger btn-block">Spine</button>        
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-6">
+                    <button type="button" class="btn btn-primary btn-block">Torso</button>
+                </div>
+            
+                <div class="col-6">
+                    <button type="button" class="btn btn-danger btn-block">Torso</button>        
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-6">
+                    <button type="button" class="btn btn-primary btn-block">Heart</button>
+                </div>
+            
+                <div class="col-6">
+                    <button type="button" class="btn btn-danger btn-block">Heart</button>        
+                </div>
+            </div>
+
+         </div>
          <div class='col-10'> Sample Grid </div>
      </div>
  </div>

@@ -1,3 +1,33 @@
+// Implement the slider increment decrement fuinctionality
+ 
+function increment_slider()
+{
+	var curr_val = document.getElementById('pca_slider').value;
+	// console.log(curr_val);
+	var new_val = parseInt(curr_val)+1
+	console.log(new_val);
+
+	if(new_val<=100)
+	{
+		document.getElementById('pca_slider').value = new_val;
+		// call modified render function
+	}
+}
+
+function decrement_slider()
+{
+	var curr_val = document.getElementById('pca_slider').value;
+	// console.log(curr_val);
+	var new_val = parseInt(curr_val)-1
+	console.log(new_val);
+
+	if(new_val>=0)
+	{
+		document.getElementById('pca_slider').value = new_val;
+		// call modified render function
+	}
+}
+
 function render_source_dest(src_path, dest_path)
 {
 	console.log(src_path);
@@ -5,16 +35,18 @@ function render_source_dest(src_path, dest_path)
 	document.getElementById("source").src = src_path + "?" + new Date().getTime();
 	document.getElementById("dest").src = dest_path + "?" + new Date().getTime();
 
-	var ids = ['image_01', 'image_02', 'image_03', 'image_04',
-			   'image_11', 'image_12', 'image_13', 'image_14'];
+	// Get data from RL algo
 
-	var x;
+	// var ids = ['image_01', 'image_02', 'image_03', 'image_04',
+	// 		   'image_11', 'image_12', 'image_13', 'image_14'];
 
-	for (x of ids)
-	{
-		console.log(x);
-		document.getElementById(x).src = dest_path + "?" + new Date().getTime();
-	}
+	// var x;
+
+	// for (x of ids)
+	// {
+	// 	console.log(x);
+	// 	document.getElementById(x).src = dest_path + "?" + new Date().getTime();
+	// }
 }
 
 function generate()

@@ -66,7 +66,7 @@
                  <div class='col-3'>
                      <button type="button" class="btn btn-primary btn-block">File</button>
                  </div>
-                 <div class='col' style="text-align:center; background-color:gray;"> Sample Generation </div>
+                 <div class='col' style="text-align:center; background-color:lightgray;"> Sample Generation </div>
              </div>
              <div class='row'>
                  <div class='col-3'>
@@ -75,21 +75,21 @@
                      </div>
                      <div class='row'></div>
                      <div class="row">
-                         <button type="button" class="btn btn-primary btn-block">Generate New Pair</button>
+                         <button type="button" class="btn btn-primary btn-block" onclick="generate()">Generate New Pair</button>
                      </div>
 
                  </div>
 
                  <div class='col-3'>
-                  <img id="source" class="rounded mx-auto d-block" alt="..." width="200" height="200" style="width:200px height=200px">
+                  <img id="source" class="rounded mx-auto d-block" alt="..." width="170" height="170" style="width:170px height=170px">
                  </div>
 
                  <div class='col-3'> 
-                  <img id="source" class="rounded mx-auto d-block" alt="..." width="200" height="200" style="width:200px height=200px">
+                  <img id="interpolated" class="rounded mx-auto d-block" alt="..." width="170" height="170" style="width:170px height=170px">
                  </div>
 
                  <div class='col-3'> 
-                  <img id="source" class="rounded mx-auto d-block" alt="..." width="200" height="200" style="width:200px height=200px">
+                  <img id="dest" class="rounded mx-auto d-block" alt="..." width="170" height="170" style="width:170px height=170px">
                  </div>
              </div>
 
@@ -100,11 +100,11 @@
                   <div class="row">
 
                      <div class="col">
-                       <button type="button" class="btn btn-primary btn-block"><</button>
+                       <button type="button" class="btn btn-primary btn-block" id="dec_slider" onclick="decrement_slider()"><</button>
                      </div>
 
                      <div class="col">
-                      <button type="button" class="btn btn-primary btn-block">></button>
+                      <button type="button" class="btn btn-primary btn-block" id="inc_slider" onclick="increment_slider()">></button>
                      </div>
                   </div>
 
@@ -113,7 +113,7 @@
                 <div class="col-9">
                   
                   <div class="row">
-                    <input type="range" min="1" max="100" value="0" class="slider" id="myRange">
+                    <input type="range" min="0" max="100" value="0" class="slider" id="pca_slider">
                   </div>
                 </div>
 
@@ -125,7 +125,7 @@
          <div class='col-3'>
              
              <div class="row mb-3"> 
-                <div class='col' style="text-align:center; background-color:gray;"> Sample Completion</div>
+                <div class='col' style="text-align:center; background-color:lightgray;"> Sample Completion</div>
              </div>
 
              <div class="row mb-3">
@@ -152,14 +152,14 @@
          </div>
          <div class='col-3'>
              <div class="row mb-3">
-                <div class='col' style="text-align:center; background-color:gray;"> Database Statistics </div>
+                <div class='col' style="text-align:center; background-color:lightgray;"> Database Statistics </div>
              </div>
              <div class="row mb-3">Graphs</div>
          </div>
      </div>
      <!-- First Row done -->
 <div class="row mb-3"> 
-    <div class='col' style="text-align:center; background-color:gray;">Sample Neighborhood Enrichment</div>
+    <div class='col' style="text-align:center; background-color:lightgray;">Sample Neighborhood Enrichment</div>
 </div>
      <div class="row">
          <div class='col-2'> 
@@ -169,7 +169,7 @@
             </div>
 
             <div class="row mb-3">
-                <div class="col-12" style="text-align:center; background-color:gray;">
+                <div class="col-12" style="text-align:center; background-color:lightgray;">
                     <div class="row">
                         <div class="col">Select Instance</div>
                         <div class="col">
@@ -195,7 +195,7 @@
 
             </div>
 
-            <div class="row mb-3" style="text-align:center; background-color:gray;">
+            <div class="row mb-3" style="text-align:center; background-color:lightgray;">
                 <div class="col">
                     <button type="button" class="btn btn-primary btn-block">All</button>
                 </div>

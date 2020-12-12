@@ -103,7 +103,7 @@
                 
                 <div class='col-3'>
                   
-                  <div class="row">
+                  <div class="row mb-3">
 
                      <div class="col">
                        <button type="button" class="btn btn-primary btn-block" id="dec_slider" onclick="decrement_slider()"><</button>
@@ -118,8 +118,8 @@
 
                 <div class="col-9">
                   
-                  <div class="row">
-                    <input type="range" min="0" max="100" value="0" class="slider" id="pca_slider">
+                  <div class="row mb-3">
+                    <input type="range" min="0" max="100" value="0" class="slider" id="pca_slider" oninput="slider_response(this.value)">
                   </div>
                 </div>
 

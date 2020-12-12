@@ -14,6 +14,15 @@ IMG_SOURCES = {
 	'interpolated': 'static/images/interpolated.png'
 }
 
+def clear_files():
+
+	for key in IMG_SOURCES:
+
+		filename = IMG_SOURCES[key]
+		
+		if os.path.exists(filename):
+			os.remove(filename)
+
 class Images:
 	
 	def __init__(self):
@@ -68,4 +77,5 @@ def interpolate():
 	return {'interpolated': url_for('static', filename="images/interpolated.png")}
 
 if __name__=='__main__':
+	clear_files()
 	app.run(debug=True)

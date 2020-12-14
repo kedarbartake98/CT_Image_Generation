@@ -22,6 +22,7 @@ class PrefInterface:
     def __init__(self, synthetic_prefs, max_segs, log_dir): # synthetic_prefs ???
         self.vid_q = Queue()
         if not synthetic_prefs:
+            pass
             ### start your custom interface 
 #             self.renderer = VideoRenderer(vid_queue=self.vid_q,
 #                                           mode=VideoRenderer.restart_on_get_mode,

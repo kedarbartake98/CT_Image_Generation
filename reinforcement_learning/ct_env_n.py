@@ -2,7 +2,7 @@ import argparse
 import gym
 from gym import spaces
 from numpy.testing import assert_equal
-from utils import get_normalized_organ_data, load_componets, load_samples, get_first_grp_struct, get_second_grp_struct, get_third_grp_struct
+from reinforcement_learning.utils import get_normalized_organ_data, load_componets, load_samples, get_first_grp_struct, get_second_grp_struct, get_third_grp_struct
 
 import numpy as np
 

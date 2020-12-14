@@ -6,11 +6,10 @@ import queue
 import time
 import zlib
 from threading import Lock, Thread
-from utils import vector_to_image
 
 import easy_tf_log
 import numpy as np
-
+from reinforcement_learning.utils import vector_to_image
 
 class Segment:
     """
@@ -196,3 +195,6 @@ class PrefBuffer:
                 break
             print("Waiting for preferences; {} so far".format(train_len))
             time.sleep(5.0)
+
+
+

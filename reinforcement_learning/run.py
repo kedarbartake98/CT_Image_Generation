@@ -1,16 +1,13 @@
-
 import logging
 import os
 from os import path as osp
 import sys
 import time
 from multiprocessing import Process, Queue
-
 import cloudpickle
 import easy_tf_log
-from a2c import logger
-from a2c.a2c.a2c import learn
-from a2c.a2c.policies import CnnPolicy, MlpPolicy
+
+from ct_env_n import CustomEnv
 # from a2c.common import set_global_seeds
 # from a2c.common.vec_env.subproc_vec_env import SubprocVecEnv
 # from params import parse_args, PREFS_VAL_FRACTION
@@ -18,10 +15,13 @@ from pref_db import PrefDB, PrefBuffer
 from pref_interface import PrefInterface
 from reward_predictor import RewardPredictorEnsemble
 from reward_predictor_core_network import net_cnn, net_moving_dot_features
-from utils import VideoRenderer, get_port_range, make_env
+# from utils import VideoRenderer, get_port_range, make_env
+from utils import get_port_range
 
 # os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'  # filter out INFO messages
 
+
+print("Loaded RUN module!")
 
 def main():
     general_params, a2c_params, \
@@ -60,11 +60,11 @@ def run(general_params,
                                make_reward_predictor)
     
     if general_params['mode'] == 'gather_initial_prefs':
-        cluster_dict = create_cluster_dict(['ps', 'a2c'])
-        ps_proc = start_parameter_server(cluster_dict, make_reward_predictor)
+        cluster_dict = create_cluster_dict(['a2c'])   ### ??? ERROR
+#         ps_proc = start_parameter_server(cluster_dict, make_reward_predictor)  # this needs to be commented out
         env, a2c_proc = start_policy_training(
             cluster_dict=cluster_dict,
-            make_reward_predictor=make_reward_predictor,
+            make_reward_predictor=make_reward_predictor,  # since reward pred is used to get rewards
             gen_segments=True,
             start_policy_training_pipe=start_policy_training_flag,
             seg_pipe=seg_pipe,
@@ -190,15 +190,16 @@ def configure_a2c_logger(log_dir):
     logger.Logger.CURRENT = logger.Logger(dir=a2c_dir, output_formats=[tb])
 
 
-def make_envs(env_id, n_envs, seed):
-    def wrap_make_env(env_id, rank):
-        def _thunk():
-            return make_env(env_id, seed + rank)
-        return _thunk
-    set_global_seeds(seed)
-    env = SubprocVecEnv(env_id, [wrap_make_env(env_id, i)
-                                 for i in range(n_envs)])
-    return env
+# def make_envs(n_envs):
+# #     def wrap_make_env(env_id, rank):
+# #         def _thunk():
+# #             return make_env(env_id, seed + rank)
+# #         return _thunk
+# # #     set_global_seeds(seed)
+# #     env = SubprocVecEnv(env_id, [wrap_make_env(env_id, i)
+# #                                  for i in range(n_envs)])
+#     env = CustomEnv(n_envs)
+#     return env
 
 
 def start_parameter_server(cluster_dict, make_reward_predictor):
@@ -221,9 +222,9 @@ def start_policy_training(cluster_dict, make_reward_predictor, gen_segments,
 #     configure_a2c_logger(log_dir)
 
     # Done here because daemonic processes can't have children
-    env = make_envs(a2c_params['env_id'],
-                    a2c_params['n_envs'],
-                    a2c_params['seed']) # seed ???
+    env = CustomEnv(#a2c_params['env_id'],
+                    a2c_params['n_envs'])
+                    # a2c_params['seed']) # seed ??? -solved
     del a2c_params['env_id'], a2c_params['n_envs']
 
     ckpt_dir = osp.join(log_dir, 'policy_checkpoints')
@@ -357,3 +358,8 @@ def start_reward_predictor_training(cluster_dict,
 
 if __name__ == '__main__':
     main()
+
+
+from a2c import logger
+from a2c.a2c.a2c import learn
+from a2c.a2c.policies import CnnPolicy, MlpPolicy

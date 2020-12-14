@@ -10,7 +10,6 @@ import gym
 import numpy as np
 import pyglet
 
-from a2c.common.atari_wrappers import wrap_deepmind
 from scipy.ndimage import zoom
 
 
@@ -166,6 +165,7 @@ def batch_iter(data, batch_size, shuffle=False):
 
 def make_env(env_id, seed=0):
     import ct_env
+    from a2c.common.atari_wrappers import wrap_deepmind
     env = gym.make(env_id)
     env.seed(seed)
     return wrap_deepmind(env)

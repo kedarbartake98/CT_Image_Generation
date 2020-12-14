@@ -8,6 +8,8 @@ import numpy as np
 from PCA_rep import PCA_rep
 import cv2
 
+from reinforcement_learning import run, a2c
+
 IMG_SOURCES = {	
 	'source_img': 'static/images/source.png',
 	'dest_img': 'static/images/dest.png',

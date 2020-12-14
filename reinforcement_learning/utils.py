@@ -5,12 +5,14 @@ import time
 import pickle
 from multiprocessing import Process
 from scipy.interpolate import splprep, splev
+from sklearn import preprocessing
 
 import gym
 import numpy as np
 import pyglet
 
 from scipy.ndimage import zoom
+# from a2c.common.atari_wrappers import wrap_deepmind
 
 
 # https://github.com/joschu/modular_rl/blob/master/modular_rl/running_stat.py
@@ -162,13 +164,11 @@ def batch_iter(data, batch_size, shuffle=False):
         yield batch
         start_idx += batch_size
 
-
-def make_env(env_id, seed=0):
-    import ct_env
-    from a2c.common.atari_wrappers import wrap_deepmind
-    env = gym.make(env_id)
-    env.seed(seed)
-    return wrap_deepmind(env)
+# def make_env(env_id, seed=0):
+#     import ct_env
+#     env = gym.make(env_id)
+#     env.seed(seed)
+#     return wrap_deepmind(env)
 
 def get_first_grp_struct():
     ll = []
@@ -212,6 +212,28 @@ def get_second_grp_struct():
 def load_samples():
     samples_data = pickle.load(open("newgooddata.pkl","rb"))
     return samples_data
+
+def get_normalized_organ_data(samples):
+    scaled_orgs = []
+    org_est = []
+    org_l = [20, 8, 8, 8, 4, 4] # ?? 3 3
+    for org in range(6):
+        organ = np.reshape(np.asarray(samples)[:,org,:], (-1, org_l[org]))
+        org_nor_est = preprocessing.MinMaxScaler()
+        org_scaled = org_nor_est.fit_transform(organ)
+        scaled_orgs.append(org_scaled)
+        org_est.append(org_nor_est)
+        
+    scaled_samples = []
+    for i in range(len(scaled_orgs[0])):
+        scaled_img = [scaled_orgs[org][i].tolist() for org in range(6)]
+        scaled_samples.append(scaled_img)
+    
+    return scaled_samples, org_est
+#     tor_nor_est = preprocessing.MinMaxScaler()
+#     torso_scaled = tor_nor_est.fit_transform(torso)
+#     return torso_scaled, tor_nor_est
+    
 
 def load_componets():
     f1 = open('/Users/arjunkrishna/CT_image_pca_visualization/data/pgnn/pgnn/BMDSXY_NODES_POS1.txt', "r")

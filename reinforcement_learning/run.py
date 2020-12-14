@@ -7,21 +7,19 @@ from multiprocessing import Process, Queue
 import cloudpickle
 import easy_tf_log
 
-from ct_env_n import CustomEnv
+from reinforcement_learning.ct_env_n import CustomEnv
 # from a2c.common import set_global_seeds
 # from a2c.common.vec_env.subproc_vec_env import SubprocVecEnv
 # from params import parse_args, PREFS_VAL_FRACTION
-from pref_db import PrefDB, PrefBuffer
-from pref_interface import PrefInterface
-from reward_predictor import RewardPredictorEnsemble
-from reward_predictor_core_network import net_cnn, net_moving_dot_features
-# from utils import VideoRenderer, get_port_range, make_env
-from utils import get_port_range
+from reinforcement_learning.pref_db import PrefDB, PrefBuffer
+from reinforcement_learning.pref_interface import PrefInterface
+from reinforcement_learning.reward_predictor import RewardPredictorEnsemble
+from reinforcement_learning.utils import get_port_range
 
 # os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'  # filter out INFO messages
 
 
-print("Loaded RUN module!")
+# print("Loaded RUN module!")
 
 def main():
     general_params, a2c_params, \
@@ -360,6 +358,6 @@ if __name__ == '__main__':
     main()
 
 
-from a2c import logger
-from a2c.a2c.a2c import learn
-from a2c.a2c.policies import CnnPolicy, MlpPolicy
+from reinforcement_learning.a2c import logger
+from reinforcement_learning.a2c.a2c.a2c import learn
+from reinforcement_learning.a2c.a2c.policies import MlpPolicy

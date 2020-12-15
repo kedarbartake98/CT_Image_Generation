@@ -19,7 +19,7 @@ from reinforcement_learning.utils import get_port_range
 # os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'  # filter out INFO messages
 
 
-# print("Loaded RUN module!")
+print("Loaded RUN module!")
 
 def main():
     general_params, a2c_params, \

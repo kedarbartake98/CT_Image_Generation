@@ -59,9 +59,9 @@ class CustomEnv(gym.Env):
             # we are not checking for 'no action' action since longer routes 
             # would mean larger rewards
             self.current_step = 0
-            done = True
+            done = [True for _ in range(self.nenvs)]
         else:
-            done = False
+            done = [False for _ in range(self.nenvs)]
         # comment since we are handling it later
 #         delay_modifier = (self.current_step / self.MAX_STEPS) #DEFINE
         reward = np.zeros(self.nenvs)

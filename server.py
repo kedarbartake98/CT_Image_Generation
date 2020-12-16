@@ -6,9 +6,11 @@ import config
 import sys
 import numpy as np
 from PCA_rep import PCA_rep
+from multiprocessing import Process, Queue
 import cv2
 
 from reinforcement_learning import run, a2c
+from rl_init_params import init_arg_tuple
 
 IMG_SOURCES = {	
 	'source_img': 'static/images/source.png',
@@ -17,7 +19,9 @@ IMG_SOURCES = {
 }
 
 def clear_files():
-
+	'''
+	Cleanup function
+	'''
 	for key in IMG_SOURCES:
 
 		filename = IMG_SOURCES[key]
@@ -26,7 +30,10 @@ def clear_files():
 			os.remove(filename)
 
 class Images:
-	
+	'''
+	Object having functions to generate images from and interpolate 
+	in the PCA space
+	'''	
 	def __init__(self):
 		self.source = None
 		self.dest = None 
@@ -61,6 +68,8 @@ image = Images()
 def entrypoint():
 	return render_template('index.html')
 
+################### Code for Image generation/interpolation ####################
+
 @app.route('/generate_images', methods=['POST'])
 
 def generate():
@@ -74,10 +83,65 @@ def generate():
 
 def interpolate():
 	inc = request.form['inc']
-	print('Inc', inc)
+	# print('Inc', inc)
 	image.interpolate(float(inc))
-	return {'interpolated': url_for('static', filename="images/interpolated.png")}
+	return {'interpolated': url_for('static', \
+									filename="images/interpolated.png")}
+
+############################## Backend Code #################################### 
+
+def initialize_comms():
+	'''
+	Initialize global queues for communication between frontend and backend
+	processes.
+	'''
+	seg_pipe = Queue(maxsize=1)
+	pref_pipe = Queue(maxsize=1)
+	start_policy_training_flag = Queue(maxsize=1)
+
+	return seg_pipe, pref_pipe, start_policy_training_flag
+
+def start_backend(init_arg_tuple, comm_pipes):
+
+	print('Starting Backend ...')
+
+	# Unpack params
+	general_params, a2c_params, pref_interface_params, \
+	rew_pred_training_params = init_arg_tuple
+
+	# Unpack pipes
+	seg_pipe, pref_pipe, start_policy_training_flag = comm_pipes
+
+	# Call main run function (3 modes from run.py)
+	run(general_params, a2c_params, pref_interface_params, 
+		rew_pred_training_params, seg_pipe, pref_pipe, 
+		start_policy_training_flag)
+
+################################################################################
+
+def run_web_app():
+	app.run(debug=True)
 
 if __name__=='__main__':
+	'''
+	The function will run the front end and backend in separate processes and 
+	establish communication between them using multiprocessing Queues.
+	'''
 	clear_files()
-	app.run(debug=True)
+
+	# Initialize communication pipes
+	seg_pipe, pref_pipe, start_policy_training_flag = initialize_comms()
+	comm_pipes = (seg_pipe, pref_pipe, start_policy_training_flag)
+
+	# TODO Arjun - set params in rl_init_params.py
+
+	# Calling the Reinforcement Learning Script
+	print('Starting Backend ..')
+	backend_process = Process(target=start_backend, args=(init_arg_tuple,
+														  comm_pipes))
+	backend_process.start()
+
+	# Initializing Frontend
+	print('Rendering Web App ...')
+	fr_end_process = Process(target=run_web_app)
+	fr_end_process.start()

@@ -6,7 +6,7 @@ import sys
 import time
 
 def parse_args():
-    from a2c.a2c.utils import Scheduler
+    from reinforcement_learning.a2c.a2c.utils import Scheduler
     parser = argparse.ArgumentParser(
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     add_general_args(parser)

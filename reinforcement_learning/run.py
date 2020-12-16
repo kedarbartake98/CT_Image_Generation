@@ -15,13 +15,13 @@ from reinforcement_learning.pref_db import PrefDB, PrefBuffer
 from reinforcement_learning.pref_interface import PrefInterface
 from reinforcement_learning.reward_predictor import RewardPredictorEnsemble
 from reinforcement_learning.utils import get_port_range
+from reinforcement_learning.params import parse_args, PREFS_VAL_FRACTION
 
 # os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'  # filter out INFO messages
 
-
-print("Loaded RUN module!")
-
+# MAIN execution function
 def main():
+    # print('EXECUTING from run.main 2')
     general_params, a2c_params, \
         pref_interface_params, rew_pred_training_params = parse_args()
 
@@ -33,16 +33,17 @@ def main():
         pref_interface_params,
         rew_pred_training_params)
 
-
+# Function executing code depending on 3 modes  
 def run(general_params,
         a2c_params,
         pref_interface_params,
-        rew_pred_training_params):
-    seg_pipe = Queue(maxsize=1)
-    pref_pipe = Queue(maxsize=1)
-    start_policy_training_flag = Queue(maxsize=1)  #???
+        rew_pred_training_params,
+        seg_pipe,
+        pref_pipe,
+        start_policy_training_flag):
 
-    reward_predictor_network #= net_cnn
+    ## TODO Arjun - initialize reward pred network
+    # reward_predictor_network #= net_cnn
 
     def make_reward_predictor(name, cluster_dict):
         return RewardPredictorEnsemble(
@@ -355,6 +356,7 @@ def start_reward_predictor_training(cluster_dict,
 
 
 if __name__ == '__main__':
+    print('EXECUTING from run.main')
     main()
 
 

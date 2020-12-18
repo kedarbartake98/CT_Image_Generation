@@ -9,7 +9,9 @@ reinforcement_learning/params.py
 
 general_args = {
 	'mode': 'gather_initial_prefs',
-	'log_dir': 'logs'
+	'log_dir': 'logs',
+	'max_prefs': 20000,
+	'n_initial_prefs': 8
 }
 
 pref_interface_args = {
@@ -17,7 +19,7 @@ pref_interface_args = {
 }
 
 reward_predictor_args = {
-	'param' : 'param'
+	'lr' : 2e-4
 }
 
 a2c_args = {

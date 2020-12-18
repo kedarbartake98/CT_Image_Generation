@@ -151,3 +151,7 @@ if __name__=='__main__':
 	print('Rendering Web App ...')
 	fr_end_process = Process(target=run_web_app)
 	fr_end_process.start()
+
+
+	fr_end_process.join()
+	backend_process.join()

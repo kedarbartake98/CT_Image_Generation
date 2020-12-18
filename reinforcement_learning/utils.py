@@ -242,12 +242,12 @@ def get_normalized_organ_data(samples):
     
 
 def load_componets():
-    f1 = open('/Users/arjunkrishna/CT_image_pca_visualization/data/pgnn/pgnn/BMDSXY_NODES_POS1.txt', "r")
-    f2 = open('/Users/arjunkrishna/CT_image_pca_visualization/data/pgnn/pgnn/BMDSXY_NODES_POS2.txt', "r")
-    f3 = open('/Users/arjunkrishna/CT_image_pca_visualization/data/pgnn/pgnn/BMDSXY_NODES_POS3.txt', "r")
-    f4 = open('/Users/arjunkrishna/CT_image_pca_visualization/data/pgnn/pgnn/BMDSXY_NODES_POS4.txt', "r")
-    f5 = open('/Users/arjunkrishna/CT_image_pca_visualization/data/pgnn/pgnn/BMDSXY_NODES_POS5.txt', "r")
-    f = open('/Users/arjunkrishna/CT_image_pca_visualization/data/pgnn/pgnn/BMDSXY_NODES_POS.txt', "r")
+    f1 = open('data/pgnn/pgnn/BMDSXY_NODES_POS1.txt', "r")
+    f2 = open('data/pgnn/pgnn/BMDSXY_NODES_POS2.txt', "r")
+    f3 = open('data/pgnn/pgnn/BMDSXY_NODES_POS3.txt', "r")
+    f4 = open('data/pgnn/pgnn/BMDSXY_NODES_POS4.txt', "r")
+    f5 = open('data/pgnn/pgnn/BMDSXY_NODES_POS5.txt', "r")
+    f = open('data/pgnn/pgnn/BMDSXY_NODES_POS.txt', "r")
 
     data = [{}, {}, {}, {}, {}, {}]
     datal = [[], [], [], [], [], []]

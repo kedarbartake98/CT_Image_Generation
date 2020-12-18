@@ -77,8 +77,8 @@ class RewardPredictorEnsemble:
     def init_sess(cluster_dict, cluster_job_name):
         graph = tf.Graph()
         cluster = tf.train.ClusterSpec(cluster_dict)
-        config = tf.ConfigProto(gpu_options={'allow_growth': True})
-        server = tf.train.Server(cluster, job_name=cluster_job_name, config=config)
+        config = tf.compat.v1.ConfigProto(gpu_options={'allow_growth': True})
+        server = tf.compat.v1.train.Server(cluster, job_name=cluster_job_name, config=config)
         sess = tf.Session(server.target, graph)
         return graph, sess
 

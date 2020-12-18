@@ -236,10 +236,12 @@ def start_policy_training(cluster_dict, make_reward_predictor, gen_segments,
     del a2c_params['n_envs']
 
     ckpt_dir = osp.join(log_dir, 'policy_checkpoints')
-    os.makedirs(ckpt_dir)
+
+    if not os.path.exists(ckpt_dir):
+        os.makedirs(ckpt_dir)
 
     def f():
-        reward_predictor ## get  = make_reward_predictor('a2c', cluster_dict) #load_rewa...
+        reward_predictor = make_reward_predictor('a2c', cluster_dict)
         misc_logs_dir = osp.join(log_dir, 'a2c_misc')
         easy_tf_log.set_dir(misc_logs_dir)
         learn(

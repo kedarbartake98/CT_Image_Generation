@@ -2,24 +2,30 @@ import os
 import numpy as np
 import tensorflow as tf
 from collections import deque
+from scipy.interpolate import splprep, splev
 
 def sample(logits):
-    noise = tf.random_uniform(tf.shape(logits))
-    return tf.argmax(logits - tf.log(-tf.log(noise)), 1)
+    noise1 = tf.random_uniform(tf.shape(logits))
+#     noise2 = tf.random_uniform(tf.shape(logits))
+    # the values should be random in the beginning, so should be different
+    # in the beginning before returning usually the same actions for both
+    # what if it chooses the 'do-nothing action?'
+    # maybe just use sequence of actions as different output (8 actions = 8 output)
+    # maybe don't use this framework at all and do the alternate classifier training ( seperate 
+    # usual cnns) and reinforcement learning.
+    return tf.argmax(logits - tf.log(-tf.log(3*noise1)), 1)#,
+#             tf.argmax(logits - tf.log(-tf.log(noise2)), 1)
 
-def cat_entropy(logits):
-    a0 = logits - tf.reduce_max(logits, 1, keepdims=True)
-    ea0 = tf.exp(a0)
-    z0 = tf.reduce_sum(ea0, 1, keepdims=True)
-    p0 = ea0 / z0
-    return tf.reduce_sum(p0 * (tf.log(z0) - a0), 1)
 
-def cat_entropy_softmax(p0):
-    return - tf.reduce_sum(p0 * tf.log(p0 + 1e-6), axis = 1)
-
-def mse(pred, target):
-    return tf.square(pred-target)/2.
-
+def fc(x, scope, nh, act=tf.nn.relu, init_scale=1.0):
+    with tf.variable_scope(scope):
+        nin = x.get_shape()[1].value
+        w = tf.get_variable("w", [nin, nh], initializer=ortho_init(init_scale))
+        b = tf.get_variable("b", [nh], initializer=tf.constant_initializer(0.0))
+        z = tf.matmul(x, w)+b
+        h = act(z)
+        return h
+    
 def ortho_init(scale=1.0):
     def _ortho_init(shape, dtype, partition_info=None):
         #lasagne ortho init for tf
@@ -37,107 +43,22 @@ def ortho_init(scale=1.0):
         return (scale * q[:shape[0], :shape[1]]).astype(np.float32)
     return _ortho_init
 
-def conv(x, scope, nf, rf, stride, pad='VALID', act=tf.nn.relu, init_scale=1.0):
-    with tf.variable_scope(scope):
-        nin = x.get_shape()[3].value
-        w = tf.get_variable("w", [rf, rf, nin, nf], initializer=ortho_init(init_scale))
-        b = tf.get_variable("b", [nf], initializer=tf.constant_initializer(0.0))
-        z = tf.nn.conv2d(x, w, strides=[1, stride, stride, 1], padding=pad)+b
-        h = act(z)
-        return h
+def cat_entropy(logits):
+    a0 = logits - tf.reduce_max(logits, 1, keepdims=True)
+    ea0 = tf.exp(a0)
+    z0 = tf.reduce_sum(ea0, 1, keepdims=True)
+    p0 = ea0 / z0
+    return tf.reduce_sum(p0 * (tf.log(z0) - a0), 1)
 
-def fc(x, scope, nh, act=tf.nn.relu, init_scale=1.0):
-    with tf.variable_scope(scope):
-        nin = x.get_shape()[1].value
-        w = tf.get_variable("w", [nin, nh], initializer=ortho_init(init_scale))
-        b = tf.get_variable("b", [nh], initializer=tf.constant_initializer(0.0))
-        z = tf.matmul(x, w)+b
-        h = act(z)
-        return h
+# def cat_entropy_softmax(p0):
+#     return - tf.reduce_sum(p0 * tf.log(p0 + 1e-6), axis = 1)
 
-def batch_to_seq(h, nbatch, nsteps, flat=False):
-    if flat:
-        h = tf.reshape(h, [nbatch, nsteps])
-    else:
-        h = tf.reshape(h, [nbatch, nsteps, -1])
-    return [tf.squeeze(v, [1]) for v in tf.split(axis=1, num_or_size_splits=nsteps, value=h)]
+def mse(pred, target):
+    return tf.square(pred-target)/2.
 
-def seq_to_batch(h, flat = False):
-    shape = h[0].get_shape().as_list()
-    if not flat:
-        assert(len(shape) > 1)
-        nh = h[0].get_shape()[-1].value
-        return tf.reshape(tf.concat(axis=1, values=h), [-1, nh])
-    else:
-        return tf.reshape(tf.stack(values=h, axis=1), [-1])
-
-def lstm(xs, ms, s, scope, nh, init_scale=1.0):
-    nbatch, nin = [v.value for v in xs[0].get_shape()]
-    nsteps = len(xs)
-    with tf.variable_scope(scope):
-        wx = tf.get_variable("wx", [nin, nh*4], initializer=ortho_init(init_scale))
-        wh = tf.get_variable("wh", [nh, nh*4], initializer=ortho_init(init_scale))
-        b = tf.get_variable("b", [nh*4], initializer=tf.constant_initializer(0.0))
-
-    c, h = tf.split(axis=1, num_or_size_splits=2, value=s)
-    for idx, (x, m) in enumerate(zip(xs, ms)):
-        c = c*(1-m)
-        h = h*(1-m)
-        z = tf.matmul(x, wx) + tf.matmul(h, wh) + b
-        i, f, o, u = tf.split(axis=1, num_or_size_splits=4, value=z)
-        i = tf.nn.sigmoid(i)
-        f = tf.nn.sigmoid(f)
-        o = tf.nn.sigmoid(o)
-        u = tf.tanh(u)
-        c = f*c + i*u
-        h = o*tf.tanh(c)
-        xs[idx] = h
-    s = tf.concat(axis=1, values=[c, h])
-    return xs, s
-
-def _ln(x, g, b, e=1e-5, axes=[1]):
-    u, s = tf.nn.moments(x, axes=axes, keep_dims=True)
-    x = (x-u)/tf.sqrt(s+e)
-    x = x*g+b
-    return x
-
-def lnlstm(xs, ms, s, scope, nh, init_scale=1.0):
-    nbatch, nin = [v.value for v in xs[0].get_shape()]
-    nsteps = len(xs)
-    with tf.variable_scope(scope):
-        wx = tf.get_variable("wx", [nin, nh*4], initializer=ortho_init(init_scale))
-        gx = tf.get_variable("gx", [nh*4], initializer=tf.constant_initializer(1.0))
-        bx = tf.get_variable("bx", [nh*4], initializer=tf.constant_initializer(0.0))
-
-        wh = tf.get_variable("wh", [nh, nh*4], initializer=ortho_init(init_scale))
-        gh = tf.get_variable("gh", [nh*4], initializer=tf.constant_initializer(1.0))
-        bh = tf.get_variable("bh", [nh*4], initializer=tf.constant_initializer(0.0))
-
-        b = tf.get_variable("b", [nh*4], initializer=tf.constant_initializer(0.0))
-
-        gc = tf.get_variable("gc", [nh], initializer=tf.constant_initializer(1.0))
-        bc = tf.get_variable("bc", [nh], initializer=tf.constant_initializer(0.0))
-
-    c, h = tf.split(axis=1, num_or_size_splits=2, value=s)
-    for idx, (x, m) in enumerate(zip(xs, ms)):
-        c = c*(1-m)
-        h = h*(1-m)
-        z = _ln(tf.matmul(x, wx), gx, bx) + _ln(tf.matmul(h, wh), gh, bh) + b
-        i, f, o, u = tf.split(axis=1, num_or_size_splits=4, value=z)
-        i = tf.nn.sigmoid(i)
-        f = tf.nn.sigmoid(f)
-        o = tf.nn.sigmoid(o)
-        u = tf.tanh(u)
-        c = f*c + i*u
-        h = o*tf.tanh(_ln(c, gc, bc))
-        xs[idx] = h
-    s = tf.concat(axis=1, values=[c, h])
-    return xs, s
-
-def conv_to_fc(x):
-    nh = np.prod([v.value for v in x.get_shape()[1:]])
-    x = tf.reshape(x, [-1, nh])
-    return x
+def find_trainable_variables(key):
+    with tf.variable_scope(key):
+        return tf.trainable_variables()
 
 def discount_with_dones(rewards, dones, gamma):
     discounted = []
@@ -146,10 +67,6 @@ def discount_with_dones(rewards, dones, gamma):
         r = reward + gamma * r * (1. - done)  # fixed off by one bug
         discounted.append(r)
     return discounted[::-1]
-
-def find_trainable_variables(key):
-    with tf.variable_scope(key):
-        return tf.trainable_variables()
 
 def make_path(f):
     return os.makedirs(f, exist_ok=True)
@@ -160,94 +77,149 @@ def constant(p):
 def linear(p):
     return 1-p
 
-schedules = {
-    'linear':linear,
-    'constant':constant
-}
-
-class Scheduler(object):
-
-    def __init__(self, v, nvalues, schedule):
-        self.n = 0.
-        self.v = v
-        self.nvalues = nvalues
-        self.schedule = schedules[schedule]
-
-    def value(self):
-        current_value = self.v*self.schedule(self.n/self.nvalues)
-        self.n += 1.
-        return current_value
-
-    def value_steps(self, steps):
-        return self.v*self.schedule(steps/self.nvalues)
-
-
-class EpisodeStats:
-    def __init__(self, nsteps, nenvs):
-        self.episode_rewards = []
-        for i in range(nenvs):
-            self.episode_rewards.append([])
-        self.lenbuffer = deque(maxlen=40)  # rolling buffer for episode lengths
-        self.rewbuffer = deque(maxlen=40)  # rolling buffer for episode rewards
-        self.nsteps = nsteps
-        self.nenvs = nenvs
-
-    def feed(self, rewards, masks):
-        rewards = np.reshape(rewards, [self.nenvs, self.nsteps])
-        masks = np.reshape(masks, [self.nenvs, self.nsteps])
-        for i in range(0, self.nenvs):
-            for j in range(0, self.nsteps):
-                self.episode_rewards[i].append(rewards[i][j])
-                if masks[i][j]:
-                    l = len(self.episode_rewards[i])
-                    s = sum(self.episode_rewards[i])
-                    self.lenbuffer.append(l)
-                    self.rewbuffer.append(s)
-                    self.episode_rewards[i] = []
-
-    def mean_length(self):
-        if self.lenbuffer:
-            return np.mean(self.lenbuffer)
-        else:
-            return 0  # on the first params dump, no episodes are finished
-
-    def mean_reward(self):
-        if self.rewbuffer:
-            return np.mean(self.rewbuffer)
-        else:
-            return 0
-
-
-# For ACER
-def get_by_index(x, idx):
-    assert(len(x.get_shape()) == 2)
-    assert(len(idx.get_shape()) == 1)
-    idx_flattened = tf.range(0, x.shape[0]) * x.shape[1] + idx
-    y = tf.gather(tf.reshape(x, [-1]),  # flatten input
-                  idx_flattened)  # use flattened indices
-    return y
-
-def check_shape(ts,shapes):
-    i = 0
-    for (t,shape) in zip(ts,shapes):
-        assert t.get_shape().as_list()==shape, "id " + str(i) + " shape " + str(t.get_shape()) + str(shape)
-        i += 1
-
-def avg_norm(t):
-    return tf.reduce_mean(tf.sqrt(tf.reduce_sum(tf.square(t), axis=-1)))
-
-def myadd(g1, g2, param):
-    print([g1, g2, param.name])
-    assert (not (g1 is None and g2 is None)), param.name
-    if g1 is None:
-        return g2
-    elif g2 is None:
-        return g1
-    else:
-        return g1 + g2
-
 def my_explained_variance(qpred, q):
     _, vary = tf.nn.moments(q, axes=[0, 1])
     _, varpred = tf.nn.moments(q - qpred, axes=[0, 1])
     check_shape([vary, varpred], [[]] * 2)
     return 1.0 - (varpred / vary)
+
+def get_first_grp_struct():
+    ll = []
+    for x in range(12):
+        ll.append([x, x*2 + 12, x*2 + 13, x+1])
+    ll[-1][-1] = 0
+    co_in = []
+    for i,z in enumerate(ll):
+        if i == 0:
+            co_in.extend(z)
+        else:
+            co_in.extend(z[1:])
+    return co_in
+
+def get_third_grp_struct():
+    ll = []
+    for x in range(3):
+        ll.append([x, x*2 + 3, x*2 + 4, x+1])
+    ll[-1][-1] = 0
+    co_in = []
+    for i,z in enumerate(ll):
+        if i == 0:
+            co_in.extend(z)
+        else:
+            co_in.extend(z[1:])
+    return co_in
+    
+def get_second_grp_struct():
+    ll = []
+    for x in range(6):
+        ll.append([x, x*2 + 6, x*2 + 7, x+1])
+    ll[-1][-1] = 0
+    co_in = []
+    for i,z in enumerate(ll):
+        if i == 0:
+            co_in.extend(z)
+        else:
+            co_in.extend(z[1:])
+    return co_in
+
+def load_componets():
+    f1 = open('/Users/arjunkrishna/CT_image_pca_visualization/data/pgnn/pgnn/BMDSXY_NODES_POS1.txt', "r")
+    f2 = open('/Users/arjunkrishna/CT_image_pca_visualization/data/pgnn/pgnn/BMDSXY_NODES_POS2.txt', "r")
+    f3 = open('/Users/arjunkrishna/CT_image_pca_visualization/data/pgnn/pgnn/BMDSXY_NODES_POS3.txt', "r")
+    f4 = open('/Users/arjunkrishna/CT_image_pca_visualization/data/pgnn/pgnn/BMDSXY_NODES_POS4.txt', "r")
+    f5 = open('/Users/arjunkrishna/CT_image_pca_visualization/data/pgnn/pgnn/BMDSXY_NODES_POS5.txt', "r")
+    f = open('/Users/arjunkrishna/CT_image_pca_visualization/data/pgnn/pgnn/BMDSXY_NODES_POS.txt', "r")
+
+    data = [{}, {}, {}, {}, {}, {}]
+    datal = [[], [], [], [], [], []]
+    for j, f_ in enumerate([f, f1, f2, f3, f4, f5]):
+        for i,curve in enumerate(f_):
+            data[j][i] = np.reshape(np.array([int(x) for x in curve.split()]), (-1,2))
+            datal[j].append(np.array([float((int(x)-255.5)/255.5) for x in curve.split()]).tolist())
+    
+    coord_nvs = [20, 8, 8, 8, 4, 4] # 3, 3 TODO
+    ests = []
+    for org in range(6):
+        estimator = PCA(n_components=coord_nvs[org], 
+                        svd_solver='randomized').fit(np.asarray(datal[org]))
+        ests.append(estimator)
+        
+    return ests
+
+def vectors_to_images(vectors):
+    co_in = get_first_grp_struct()
+    co_in123 = get_second_grp_struct()
+    co_in45 = get_third_grp_struct()
+    ests = load_componets()
+    coord_or = [co_in, co_in123, co_in123, co_in123, co_in45, co_in45]
+    vector0 = vectors[0]
+    int_lvl = vector0[100]
+    coord_nvs = [20, 8, 8, 8, 3, 3]
+    offset = 0
+    new_points = []
+    rew = np.ones((len(vectors),) )
+    try:
+        for org in range(6):
+            if org == 0:
+                offset += coord_nvs[org]
+                continue
+            sample_o1 = vector0[offset : offset + coord_nvs[org]]
+            sample_o2 = vector0[offset + 50: offset + coord_nvs[org]]
+            if int_level == 0:
+                sample_o = 0.7*sample_o1 + 0.3*sample_o2
+            elif int_level == 1:
+                sample_o = 0.5*sample_o1 + 0.5*sample_o2
+            else:
+                sample_o = 0.3*sample_o1 + 0.7*sample_o2
+            offset += coord_nvs[org]
+            co_in_o = coord_or[org]
+            curves_es_o = ests[org].mean_
+            for i,val in enumerate(sample_o):
+                curves_es_o = curves_es_o + ests[org].components_[i]*val
+            curves_es_o = np.reshape((curves_es_o*255.5 + 255.5), (-1, 2)).astype(int).tolist()
+            c = [curves_es_o[index][0] for index in co_in_o]
+            d = [curves_es_o[index][1] for index in co_in_o]
+            tck, _ = splprep([c, d], s=0.0, per=1)
+            new_points_o = splev(np.linspace(0, 1, 1000), tck)
+            new_points.append(new_points_o)
+    except:
+        return None, rew
+    
+    gray_values = [100, 50, 150, 200, 0]  # TODO: change values for normalization
+    img = np.ones((512,512))*255
+    for ind,organ in enumerate(new_points):  # Need to be made faster / may be graphs
+        organ = np.array(organ).astype(int)
+        img[organ[0],organ[1]] = gray_values[ind]
+        img[organ[0]+1,organ[1]] = gray_values[ind]
+        img[organ[0],organ[1]+1] = gray_values[ind]
+        img[organ[0]+1,organ[1]+1] = gray_values[ind]
+        img[organ[0]-1,organ[1]] = gray_values[ind]
+        img[organ[0],organ[1]-1] = gray_values[ind]
+        img[organ[0]-1,organ[1]-1] = gray_values[ind]
+        
+    img = np.expand_dims(img, axis=0).repeat(len(vectors), 0)
+    c = -1
+    for vector, im in zip(vectors, img):
+        c+=1
+        torso = vector[101:]
+        curves_es_o = ests[0].mean_
+        for i,val in enumerate(torso):
+            curves_es_o = curves_es_o + ests[0].components_[i]*val
+        curves_es_o = np.reshape((curves_es_o*255.5 + 255.5), (-1, 2)).astype(int).tolist()
+        try:
+            c = [curves_es_o[index][0] for index in co_in]
+            d = [curves_es_o[index][1] for index in co_in]
+            tck, _ = splprep([c, d], s=0.0, per=1)
+            new_points_o = splev(np.linspace(0, 1, 1000), tck)
+            new_points_o = np.array(new_points_o).astype(int)
+        except:
+            rew[c] = 0
+            continue
+        im[new_points_o[0],new_points_o[1]] = 230
+        im[new_points_o[0]+1,new_points_o[1]] = 230
+        im[new_points_o[0],new_points_o[1]+1] = 230
+        im[new_points_o[0]+1,new_points_o[1]+1] = 230
+        im[new_points_o[0]-1,new_points_o[1]] = 230
+        im[new_points_o[0],new_points_o[1]-1] = 230
+        im[new_points_o[0]-1,new_points_o[1]-1] = 230
+    return img, rew

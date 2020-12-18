@@ -36,7 +36,7 @@ class RewardPredictorEnsemble:
             worker_device = "/job:{}/task:0/gpu:0".format(cluster_job_name)
         else:
             worker_device = "/job:{}/task:0".format(cluster_job_name)
-        device_setter = tf.train.replica_device_setter(
+        device_setter = tf.compat.v1.train.replica_device_setter(
             cluster=cluster_dict,
             ps_device="/job:ps/task:0",
             worker_device=worker_device)
@@ -44,7 +44,7 @@ class RewardPredictorEnsemble:
         with graph.as_default():
             for pred_n in range(n_preds):
                 with tf.device(device_setter):
-                    with tf.variable_scope("pred_{}".format(pred_n)):
+                    with tf.compat.v1.variable_scope("pred_{}".format(pred_n)):
                         rp = RewardPredictorNetwork(
                             core_network=core_network,
                             dropout=dropout,
@@ -56,7 +56,7 @@ class RewardPredictorEnsemble:
             # So that the plain-text 'checkpoint' file written uses relative paths,
             # which seems to be needed in order to avoid confusing saver.restore()
             # when restoring from FloydHub runs.
-            self.saver = tf.train.Saver(max_to_keep=1, save_relative_paths=True)
+            self.saver = tf.compat.v1.train.Saver(max_to_keep=1, save_relative_paths=True)
             self.summaries = self.add_summary_ops()
 
         self.checkpoint_file = osp.join(log_dir,
@@ -79,7 +79,7 @@ class RewardPredictorEnsemble:
         cluster = tf.train.ClusterSpec(cluster_dict)
         config = tf.compat.v1.ConfigProto(gpu_options={'allow_growth': True})
         server = tf.compat.v1.train.Server(cluster, job_name=cluster_job_name, config=config)
-        sess = tf.Session(server.target, graph)
+        sess = tf.compat.v1.Session(server.target, graph)
         return graph, sess
 
     def add_summary_ops(self):
@@ -293,13 +293,13 @@ class RewardPredictorNetwork:
     """
 
     def __init__(self, core_network, dropout, batchnorm, lr):
-        training = tf.placeholder(tf.bool)
+        training = tf.compat.v1.placeholder(tf.bool)
         # Each element of the batch is one trajectory segment.
         # (Dimensions are n segments x n frames per segment x ...)
-        s1 = tf.placeholder(tf.float32, shape=(None, None, 256, 256))
-        s2 = tf.placeholder(tf.float32, shape=(None, None, 256, 256))
+        s1 = tf.compat.v1.placeholder(tf.float32, shape=(None, None, 256, 256))
+        s2 = tf.compat.v1.placeholder(tf.float32, shape=(None, None, 256, 256))
         # For each trajectory segment, there is one human judgement.
-        pref = tf.placeholder(tf.float32, shape=(None, 2))
+        pref = tf.compat.v1.placeholder(tf.float32, shape=(None, 2))
 
         # Concatenate trajectory segments so that the first dimension is just
         # frames

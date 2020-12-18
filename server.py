@@ -12,6 +12,8 @@ import cv2
 from reinforcement_learning import run, a2c
 from rl_init_params import init_arg_tuple
 
+from client_server_comm import *
+
 IMG_SOURCES = {	
 	'source_img': 'static/images/source.png',
 	'dest_img': 'static/images/dest.png',
@@ -95,9 +97,9 @@ def initialize_comms():
 	Initialize global queues for communication between frontend and backend
 	processes.
 	'''
-	seg_pipe = Queue(maxsize=1)
-	pref_pipe = Queue(maxsize=1)
-	start_policy_training_flag = Queue(maxsize=1)
+	seg_pipe = Queue(maxsize=8)
+	pref_pipe = Queue(maxsize=8)
+	start_policy_training_flag = Queue(maxsize=8)
 
 	return seg_pipe, pref_pipe, start_policy_training_flag
 

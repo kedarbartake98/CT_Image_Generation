@@ -14,7 +14,7 @@ class CustomEnv(gym.Env):
 
     def __init__(self, nenvs):#, device):
         super(CustomEnv, self).__init__()
-        # self.loadData()
+        self.loadData()
         self.nenvs = nenvs
         #TODO: Normalization needed -- DONE
 #         self.curves # [

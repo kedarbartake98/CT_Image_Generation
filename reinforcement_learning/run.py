@@ -71,11 +71,11 @@ def run(general_params,
 #             episode_vid_queue=episode_vid_queue,
             log_dir=general_params['log_dir'],
             a2c_params=a2c_params)
-        pi, pi_proc = start_pref_interface(   # gather preferences through interface
-            seg_pipe=seg_pipe,
-            pref_pipe=pref_pipe,
-            log_dir=general_params['log_dir'],
-            **pref_interface_params)
+        # pi, pi_proc = start_pref_interface(   # gather preferences through interface
+        #     seg_pipe=seg_pipe,
+        #     pref_pipe=pref_pipe,
+        #     log_dir=general_params['log_dir'],
+        #     **pref_interface_params)
 
         n_train = general_params['max_prefs'] * (1 - PREFS_VAL_FRACTION)
         n_val = general_params['max_prefs'] * PREFS_VAL_FRACTION

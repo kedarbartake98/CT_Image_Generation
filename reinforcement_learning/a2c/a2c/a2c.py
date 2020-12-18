@@ -43,14 +43,14 @@ class Model(object):
         LR = tf.placeholder(tf.float32, [])
 
         step_model = policy(
-            sess, ob_space, ac_space, nenvs, 1, nstack, reuse=False)
+            sess, ob_space, ac_space, nenvs, 1, reuse=False)
         train_model = policy(
-            sess, ob_space, ac_space, nenvs, nsteps, nstack, reuse=True)
+            sess, ob_space, ac_space, nenvs, nsteps, reuse=True)
 
         neglogpac = tf.nn.sparse_softmax_cross_entropy_with_logits(
-            logits=train_model.pi, labels=A) # pi - action logits returned by policy
+            logits=train_model.pi, labels=A) # pi (nenvs, action_space.n) - action logits of policy ; not returned by policy
         pg_loss = tf.reduce_mean(ADV * neglogpac)
-        vf_loss = tf.reduce_mean(mse(tf.squeeze(train_model.vf), R)) #vf = value returned
+        vf_loss = tf.reduce_mean(mse(tf.squeeze(train_model.vf), R)) #vf = value ; not returned
         entropy = tf.reduce_mean(cat_entropy(train_model.pi))
         loss = pg_loss - entropy * ent_coef + vf_loss * vf_coef
 
@@ -124,14 +124,14 @@ class Runner(object):  # Trains workers, does actions etc and pushed clips for p
         self.model = model
 #         nh, nw, nc = env.observation_space.shape
         nh = env.observation_space.shape[0]
-        nenv = env.num_envs # 1 ???
+        nenv = env.num_envs # 8 
 #         self.batch_ob_shape = (nenv * nsteps, nh, nw, nc * nstack) nstack  = 1, 
 #         since we are not looking back 4 frames
         self.batch_ob_shape = (nenv * nsteps, nh)
-        self.obs = np.zeros((nenv, nh), dtype=np.uint8)
-        # The first stack of 4 frames: the first 3 frames are zeros,
-        # with the last frame coming from env.reset().
-        self.obs = env.reset()
+#         self.obs = np.zeros((nenv, nh), dtype=np.uint8)
+#         # The first stack of 4 frames: the first 3 frames are zeros,
+#         # with the last frame coming from env.reset().
+        self.obs, self.states = env.reset()
 #         self.update_obs(obs)
 #         self.gamma = gamma
         self.nsteps = nsteps
@@ -148,30 +148,30 @@ class Runner(object):  # Trains workers, does actions etc and pushed clips for p
 #         self.episode_frames = []
 #         self.episode_vid_queue = episode_vid_queue
 
-    def update_segment_buffer(self, mb_obs, mb_rewards, mb_dones):
+    def update_segment_buffer(self, mb_states, mb_rewards, mb_dones):
         # Segments are only generated from the first worker.
         # Empirically, this seems to work fine.
-        for e0_obs, e0_rew, e0_dones in zip(mb_obs, mb_rewards, mb_dones):
+        for e0_states, e0_rew, e0_dones in zip(mb_states, mb_rewards, mb_dones):
 #             e0_obs = mb_obs[0]
 #             e0_rew = mb_rewards[0]
 #             e0_dones = mb_dones[0]
-            assert_equal(e0_obs.shape, (self.nsteps, 93))  # ??? this is where the shape of input of (state, side torsos and main torso and organs)
+#             assert_equal(e0_obs.shape, (self.nsteps, 91))  
+            assert_equal(e0_states.shape, (self.nsteps, 121)) # 50 + 50 + 1 + 20  
             assert_equal(e0_rew.shape, (self.nsteps, ))
             assert_equal(e0_dones.shape, (self.nsteps, ))
 
             for step in range(self.nsteps):
-                self.segment.append(np.copy(e0_obs[step]), np.copy(e0_rew[step]))
+                self.segment.append(np.copy(e0_states[step]), np.copy(e0_rew[step]))
                 if len(self.segment) == 25 or e0_dones[step]:
                     while len(self.segment) < 25:  # maybe 9 max?
                         # Pad to 25 steps long so that all segments in the batch
                         # have the same length.
                         # Note that the reward predictor needs the full frame
                         # stack, so we send all frames.
-                        self.segment.append(e0_obs[step], 0)
+                        self.segment.append(e0_states[step], 0)
                     self.segment.finalise()
                     try:
-                        self.seg_pipe.put(self.segment, block=False)  ## Uncomment?? No, since our 
-                            # direction is opposite , we send clips to backend , not backend to frontend
+                        self.seg_pipe.put(self.segment, block=False)  
                     except queue.Full:
                         ### ??? we should wait for half a second or break from the 
                         ### entire eight segments
@@ -195,31 +195,34 @@ class Runner(object):  # Trains workers, does actions etc and pushed clips for p
 
     def run(self):
         nenvs = len(self.env.remotes)
-        mb_obs, mb_rewards, mb_actions, mb_values, mb_dones = \
-            [], [], [], [], []
+        mb_obs, mb_states, mb_rewards, mb_actions, mb_values, mb_dones = \
+            [], [], [], [], [], []
 #         mb_states = self.states
 
         # Run for nsteps steps in the environment
         for _ in range(self.nsteps):
-            actions, alt_actions, values, _ = self.model.step(self.obs)
+            actions, values, _ = self.model.step(self.obs)
             mb_obs.append(np.copy(self.obs))
+            mb_states.append(np.copy(self.states))
             mb_actions.append(actions)
             mb_values.append(values)
             mb_dones.append(self.dones)
             # len({obs, rewards, dones}) == nenvs
-            obs, rewards, dones, _ = self.env.step(actions) # remove rewards
+            obs, rewards, dones, states = self.env.step(actions) # remove rewards
 #             self.states = states
             self.dones = dones
 #             for n, done in enumerate(dones):
 #                 if done:
 #                     self.obs[n] = self.obs[n] * 0
-            # SubprocVecEnv automatically resets when done  ???
+            # SubprocVecEnv automatically resets when done  ??? -- Resolved
             self.obs = obs
+            self.states = states
             mb_rewards.append(rewards)
         mb_dones.append(self.dones)
         # batch of steps to batch of rollouts
         # i.e. from nsteps, nenvs to nenvs, nsteps
         mb_obs = np.asarray(mb_obs, dtype=np.uint8).swapaxes(1, 0)
+        mb_states = np.asarray(mb_states, dtype=np.uint8).swapaxes(1, 0)
         mb_rewards = np.asarray(mb_rewards, dtype=np.float32).swapaxes(1, 0)
         mb_actions = np.asarray(mb_actions, dtype=np.int32).swapaxes(1, 0)
         mb_values = np.asarray(mb_values, dtype=np.float32).swapaxes(1, 0)
@@ -269,18 +272,23 @@ class Runner(object):  # Trains workers, does actions etc and pushed clips for p
 #             self.dones = dones
 #             self.obs = obs
 #             mb_rewards.append(rewards)
-            self.update_segment_buffer(mb_obs, mb_rewards, mb_dones)
+            self.update_segment_buffer(mb_states, mb_rewards, mb_dones)
 
         # Replace rewards with those from reward predictor
         # (Note that this also needs to be done _after_ we've encoded the
         # action.)
         logging.debug("Original rewards:\n%s", mb_rewards)
         if self.reward_predictor: # Always true in our case # Find a way to merge both rewards
-            assert_equal(mb_obs.shape, (nenvs, self.nsteps, 93)) # this is where the shap.....
-            mb_obs_allenvs = mb_obs.reshape(nenvs * self.nsteps, 93)
-
-            rewards_allenvs = self.reward_predictor.reward(mb_obs_allenvs)
-            assert_equal(rewards_allenvs.shape, (nenvs * self.nsteps, ))
+            assert_equal(mb_states.shape, (nenvs, self.nsteps, 121)) # this is where the shap.....
+            mb_states_allenvs = mb_states.reshape(nenvs * self.nsteps, 121)
+            mb_images_allenvs, rew = vectors_to_images(mb_states_allenvs)
+            if mb_images_allenvs == None:
+                rewards_allenvs = np.zeros((nenvs * self.nsteps,))
+            else:
+                assert_equal(mb_images_allenvs, (nenvs * self.nsteps, 512, 512))
+                rewards_allenvs = self.reward_predictor.reward(mb_images_allenvs)
+                rewards_allenvs = np.where(rew == 0, -1, rewards_allenvs)
+                assert_equal(rewards_allenvs.shape, (nenvs * self.nsteps, ))
             ### TODO : make -1/-2.. and 1 # Can also use np.where
 #             mb_rewards = np.multiply(mb_rewards*(rewards_allenvs.reshape(nenvs, self.nsteps)))
             rewards_allenvs = rewards_allenvs.reshape(nenvs, self.nsteps)
@@ -321,7 +329,7 @@ class Runner(object):  # Trains workers, does actions etc and pushed clips for p
 
 def learn(policy,
           env,
-          seed,  ### ???
+#           seed,  ### ??? -- resolved
           start_policy_training_pipe,  
           ckpt_save_dir,
           lr_scheduler,
@@ -339,7 +347,7 @@ def learn(policy,
           ckpt_load_dir=None,
           gen_segments=False,
           seg_pipe=None,
-          reward_predictor=None):
+          reward_predictor=None,
 #           episode_vid_queue=None):
 
     tf.reset_default_graph()
@@ -448,4 +456,4 @@ def learn(policy,
 
 
 from reinforcement_learning.a2c.a2c.utils import (cat_entropy, discount_with_dones,
-                           find_trainable_variables, mse)
+                           find_trainable_variables, mse, vectors_to_images)

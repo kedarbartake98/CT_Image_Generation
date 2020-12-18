@@ -265,7 +265,7 @@ def vector_to_image(vector):
     co_in45 = get_third_grp_struct()
     ests = load_componets()
     coord_or = [co_in, co_in123, co_in123, co_in123, co_in45, co_in45]
-    coord_nvs = [20, 8, 8, 8, 4, 4]
+    coord_nvs = [20, 8, 8, 8, 3, 3]
     offset = 0
     new_points = []
     try:

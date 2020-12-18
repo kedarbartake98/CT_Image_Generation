@@ -46,9 +46,9 @@ class CustomEnv(gym.Env):
         self.all_spaces = spaces.Discrete(65)
 #         self.action_space = spaces.Tuple((spaces.Discrete(9), spaces.Discrete(8)))
         self.action_space = spaces.Discrete(65)
-        self.observation_space = spaces.Tuple((spaces.Box(low=0, high=1.0, 
-                                                          shape=(self.torso_d*3+self.lung_d*3+self.sp_d*2+1,), 
-                                                          dtype=np.float16) ))
+        self.observation_space = spaces.Box(low=0, high=1.0, 
+                                                          shape=(91,), 
+                                                          dtype=np.float16)
 
     def step(self, action):
         # Execute one time step within the environment

@@ -5,6 +5,7 @@ import time
 import pickle
 from multiprocessing import Process
 from scipy.interpolate import splprep, splev
+from sklearn.decomposition import PCA
 from sklearn import preprocessing
 
 import gym
@@ -216,9 +217,14 @@ def load_samples():
 def get_normalized_organ_data(samples):
     scaled_orgs = []
     org_est = []
-    org_l = [20, 8, 8, 8, 4, 4] # ?? 3 3
+    orgs = [[],[],[],[],[],[]]
+    
+    for img in samples:
+        for i,org in enumerate(img):
+            orgs[i].append(np.array(org).tolist())
+            
     for org in range(6):
-        organ = np.reshape(np.asarray(samples)[:,org,:], (-1, org_l[org]))
+        organ = np.array(orgs[0])
         org_nor_est = preprocessing.MinMaxScaler()
         org_scaled = org_nor_est.fit_transform(organ)
         scaled_orgs.append(org_scaled)

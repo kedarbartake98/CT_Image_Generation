@@ -214,9 +214,15 @@ def start_parameter_server(cluster_dict, make_reward_predictor):
 
 # Train Button -- "In interface"
 # we have to start listening for running this main program as well
+
+# CHANGED function signature BY KEDAR 
+# def start_policy_training(cluster_dict, make_reward_predictor, gen_segments,
+#                           start_policy_training_pipe, seg_pipe,
+#                           episode_vid_queue, log_dir, a2c_params):
+
 def start_policy_training(cluster_dict, make_reward_predictor, gen_segments,
-                          start_policy_training_pipe, seg_pipe,
-                          episode_vid_queue, log_dir, a2c_params):
+                          start_policy_training_pipe, seg_pipe, log_dir, 
+                          a2c_params):
     policy_fn = MlpPolicy
 
 #     configure_a2c_logger(log_dir)
@@ -225,7 +231,9 @@ def start_policy_training(cluster_dict, make_reward_predictor, gen_segments,
     env = CustomEnv(#a2c_params['env_id'],
                     a2c_params['n_envs'])
                     # a2c_params['seed']) # seed ??? -solved
-    del a2c_params['env_id'], a2c_params['n_envs']
+    
+    # del a2c_params['env_id'], a2c_params['n_envs']
+    del a2c_params['n_envs']
 
     ckpt_dir = osp.join(log_dir, 'policy_checkpoints')
     os.makedirs(ckpt_dir)

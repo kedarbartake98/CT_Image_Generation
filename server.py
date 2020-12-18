@@ -106,13 +106,17 @@ def start_backend(init_arg_tuple, comm_pipes):
 	print('Starting Backend ...')
 
 	# Unpack params
-	general_params, a2c_params, pref_interface_params, \
-	rew_pred_training_params = init_arg_tuple
+	general_params, pref_interface_params, \
+	rew_pred_training_params, a2c_params = init_arg_tuple
 
 	# Unpack pipes
 	seg_pipe, pref_pipe, start_policy_training_flag = comm_pipes
 
 	# Call main run function (3 modes from run.py)
+
+	print("Calling the run function")
+	print(a2c_params)
+
 	run(general_params, a2c_params, pref_interface_params, 
 		rew_pred_training_params, seg_pipe, pref_pipe, 
 		start_policy_training_flag)

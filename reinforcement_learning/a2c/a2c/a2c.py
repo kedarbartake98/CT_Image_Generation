@@ -149,6 +149,9 @@ class Runner(object):  # Trains workers, does actions etc and pushed clips for p
 #         self.episode_vid_queue = episode_vid_queue
 
     def update_segment_buffer(self, mb_states, mb_rewards, mb_dones):
+
+        print('#'*100)
+        print("Called UPDATE SEGMENT Buffer")
         # Segments are only generated from the first worker.
         # Empirically, this seems to work fine.
         for e0_states, e0_rew, e0_dones in zip(mb_states, mb_rewards, mb_dones):
@@ -347,7 +350,7 @@ def learn(policy,
           ckpt_load_dir=None,
           gen_segments=False,
           seg_pipe=None,
-          reward_predictor=None,
+          reward_predictor=None):
 #           episode_vid_queue=None):
 
     tf.reset_default_graph()

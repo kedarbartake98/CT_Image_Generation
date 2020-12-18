@@ -76,9 +76,9 @@ class CustomEnv(gym.Env):
                 reward[env_n] = -1
         
         self.norm_obs_st = np.append(self.torso_est.transform(self.torsos), self.const_arr, axis=1)
-                
+        self.state = np.append(self.input_imgs, self.torsos, axis=1)        
 #         reward = reward * delay_modifier
-        return self.norm_obs_st, reward, done, {}
+        return self.norm_obs_st, reward, done, self.state
     
     def reset(self):
         self.current_step = 0
@@ -87,6 +87,10 @@ class CustomEnv(gym.Env):
         self.int_level = np.random.randrange(3)
         self.samples_img1 = self.samples[self.selected_idx1]
         self.samples_img2 = self.samples[self.selected_idx2]
+        self.samples_img1_chain = [ev for org in self.samples_img1 for ev in org]
+        self.samples_img2_chain = [ev for org in self.samples_img2 for ev in org]
+        self.input_imgs = np.asarray(samples_img1_chain.extend(samples_img2_chain).append(int_level))
+        self.input_imgs = np.expand_dims(self.norm_const_arr, axis=0).repeat(self.nenvs, 0)
         self.norm_samples_img1 = self.norm_samples[self.selected_idx1]
         self.norm_samples_img2 = self.norm_samples[self.selected_idx2]
 #         self.curves_img1 = self.curves[self.selected_idx1]
@@ -137,16 +141,17 @@ class CustomEnv(gym.Env):
         norm_tor1 = self.norm_samples_img1[0]
         norm_tor2 = self.norm_samples_img2[0]
         self.norm_const_arr = np.asarray(norm_samples_chain.extend(norm_tor1).extend(norm_tor2).append(int_level))
-        self.norm_const_arr = np.expand_dims(self.const_arr, axis=0).repeat(self.nenvs, 0)
-        self.norm_obs_st = np.append(self.torsos, self.const_arr, axis=1)
-        assert_equal(self.obs_st, (self.nenvs, 93))
+        self.norm_const_arr = np.expand_dims(self.norm_const_arr, axis=0).repeat(self.nenvs, 0)
+        self.norm_obs_st = np.append(self.norm_torsos, self.norm_const_arr, axis=1)
+        self.state = np.append(self.input_imgs, self.torsos, axis=1)
+        assert_equal(self.norm_obs_st, (self.nenvs, 91))
         
         self.curves_torsos = np.matmul(np.asarray(self.estimators[0].components_),
                                       self.torsos) + \
                                     np.asarray(self.estimators[0].mean_).repeat(self.nenvs, 0)
         assert_equal(curves_torsos, (self.nenvs, 72)) # len self.estimators[0].components_[0]
 
-        return self.norm_obs_st
+        return self.norm_obs_st, self.state
 
     def _take_action(self, action):
         

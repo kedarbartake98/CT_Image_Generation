@@ -14,6 +14,7 @@ from reinforcement_learning.ct_env_n import CustomEnv
 from reinforcement_learning.pref_db import PrefDB, PrefBuffer
 from reinforcement_learning.pref_interface import PrefInterface
 from reinforcement_learning.reward_predictor import RewardPredictorEnsemble
+from reinforcement_learning.reward_predictor_core_network import net_cnn
 from reinforcement_learning.utils import get_port_range
 from reinforcement_learning.params import parse_args, PREFS_VAL_FRACTION
 
@@ -42,8 +43,8 @@ def run(general_params,
         pref_pipe,
         start_policy_training_flag):
 
-    ## TODO Arjun - initialize reward pred network
-    # reward_predictor_network #= net_cnn
+    ## TODO Arjun - initialize reward pred network -- DONE
+    reward_predictor_network = net_cnn
 
     def make_reward_predictor(name, cluster_dict):
         return RewardPredictorEnsemble(

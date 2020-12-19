@@ -37,10 +37,10 @@ class Model(object):
 #         sess = tf.Session(config=config)
         nbatch = nenvs * nsteps   # = 5
 
-        A = tf.placeholder(tf.int32, [nbatch])
-        ADV = tf.placeholder(tf.float32, [nbatch])
-        R = tf.placeholder(tf.float32, [nbatch])
-        LR = tf.placeholder(tf.float32, [])
+        A = tf.compat.v1.placeholder(tf.int32, [nbatch])
+        ADV = tf.compat.v1.placeholder(tf.float32, [nbatch])
+        R = tf.compat.v1.placeholder(tf.float32, [nbatch])
+        LR = tf.compat.v1.placeholder(tf.float32, [])
 
         step_model = policy(
             sess, ob_space, ac_space, nenvs, 1, reuse=False)
@@ -353,14 +353,14 @@ def learn(policy,
           reward_predictor=None):
 #           episode_vid_queue=None):
 
-    tf.reset_default_graph()
+    tf.compat.v1.reset_default_graph()
 #     set_global_seeds(seed)
 
-    nenvs = env.num_envs
+    nenvs = env.nenvs
     ob_space = env.observation_space
     ac_space = env.action_space
-    num_procs = len(env.remotes)  # HACK
-
+    # num_procs = len(env.remotes)  # HACK
+# 
     def make_model():
         return Model(
             policy=policy,
@@ -369,7 +369,7 @@ def learn(policy,
             nenvs=nenvs,
             nsteps=nsteps,
 #             nstack=nstack,
-            num_procs=num_procs,
+            # num_procs=num_procs,
             ent_coef=ent_coef,
             vf_coef=vf_coef,
             max_grad_norm=max_grad_norm,

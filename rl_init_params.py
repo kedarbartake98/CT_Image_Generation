@@ -6,6 +6,7 @@ reinforcement_learning/params.py
 
 # TODO Arjun
 '''
+from reinforcement_learning.utils import Scheduler
 
 general_args = {
 	'mode': 'gather_initial_prefs',
@@ -26,11 +27,7 @@ a2c_args = {
     'log_interval': 100, 
     'ent_coef': 0.01,
     'n_envs': 8,
-    'seed': 0,
-    "lr_zero_million_timesteps": None,
-    'lr': 7e-4,
-    'policy_ckpt_interval': 100,
-    'million_timesteps': 10
+    'lr_scheduler': Scheduler(v=2e-4, nvalues=1e6, schedule='linear')
 }
 
 init_arg_tuple = (general_args, pref_interface_args, 

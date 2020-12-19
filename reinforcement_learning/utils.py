@@ -304,3 +304,31 @@ def vector_to_image(vector):
         img[organ[0]-1,organ[1]-1] = gray_values[ind]
         
     return img
+
+
+def constant(p):
+    return 1
+
+def linear(p):
+    return 1-p
+
+schedules = {
+    'linear':linear,
+    'constant':constant
+}
+
+class Scheduler(object):
+
+    def __init__(self, v, nvalues, schedule):
+        self.n = 0.
+        self.v = v
+        self.nvalues = nvalues
+        self.schedule = schedules[schedule]
+
+    def value(self):
+        current_value = self.v*self.schedule(self.n/self.nvalues)
+        self.n += 1.
+        return current_value
+
+    def value_steps(self, steps):
+        return self.v*self.schedule(steps/self.nvalues)

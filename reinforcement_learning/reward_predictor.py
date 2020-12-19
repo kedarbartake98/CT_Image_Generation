@@ -51,7 +51,7 @@ class RewardPredictorEnsemble:
                             batchnorm=batchnorm,
                             lr=lr)
                 self.rps.append(rp)
-            self.init_op = tf.global_variables_initializer()
+            self.init_op = tf.compat.v1.global_variables_initializer()
             # Why save_relative_paths=True?
             # So that the plain-text 'checkpoint' file written uses relative paths,
             # which seems to be needed in order to avoid confusing saver.restore()
@@ -62,16 +62,16 @@ class RewardPredictorEnsemble:
         self.checkpoint_file = osp.join(log_dir,
                                         'reward_predictor_checkpoints',
                                         'reward_predictor.ckpt')
-        self.train_writer = tf.summary.FileWriter(
-            osp.join(log_dir, 'reward_predictor', 'train'), flush_secs=5)
-        self.test_writer = tf.summary.FileWriter(
-            osp.join(log_dir, 'reward_predictor', 'test'), flush_secs=5)
+        self.train_writer = tf.summary.create_file_writer(
+            osp.join(log_dir, 'reward_predictor', 'train'))
+        self.test_writer = tf.summary.create_file_writer(
+            osp.join(log_dir, 'reward_predictor', 'test'))
 
         self.n_steps = 0
         self.r_norm = RunningStat(shape=n_preds)
 
         misc_logs_dir = osp.join(log_dir, 'reward_predictor', 'misc')
-        easy_tf_log.set_dir(misc_logs_dir)
+        # easy_tf_log.set_dir(misc_logs_dir)
 
     @staticmethod
     def init_sess(cluster_dict, cluster_job_name):
@@ -87,21 +87,21 @@ class RewardPredictorEnsemble:
 
         for pred_n, rp in enumerate(self.rps):
             name = 'reward_predictor_accuracy_{}'.format(pred_n)
-            op = tf.summary.scalar(name, rp.accuracy)
+            op = tf.compat.v1.summary.scalar(name, rp.accuracy)
             summary_ops.append(op)
             name = 'reward_predictor_loss_{}'.format(pred_n)
-            op = tf.summary.scalar(name, rp.loss)
+            op = tf.compat.v1.summary.scalar(name, rp.loss)
             summary_ops.append(op)
 
         mean_accuracy = tf.reduce_mean([rp.accuracy for rp in self.rps])
-        op = tf.summary.scalar('reward_predictor_accuracy_mean', mean_accuracy)
+        op = tf.compat.v1.summary.scalar('reward_predictor_accuracy_mean', mean_accuracy)
         summary_ops.append(op)
 
         mean_loss = tf.reduce_mean([rp.loss for rp in self.rps])
-        op = tf.summary.scalar('reward_predictor_loss_mean', mean_loss)
+        op = tf.compat.v1.summary.scalar('reward_predictor_loss_mean', mean_loss)
         summary_ops.append(op)
 
-        summaries = tf.summary.merge(summary_ops)
+        summaries = tf.compat.v1.summary.merge(summary_ops)
 
         return summaries
 
@@ -361,7 +361,7 @@ class RewardPredictorNetwork:
         preds_correct = tf.equal(tf.argmax(pref, 1), tf.argmax(pred, 1))
         accuracy = tf.reduce_mean(tf.cast(preds_correct, tf.float32))
 
-        _loss = tf.nn.softmax_cross_entropy_with_logits_v2(labels=pref,
+        _loss = tf.compat.v1.nn.softmax_cross_entropy_with_logits_v2(labels=pref,
                                                            logits=rs)
         # Shape should be 'batch size'
         c1 = tf.assert_rank(_loss, 1)
@@ -369,10 +369,10 @@ class RewardPredictorNetwork:
             loss = tf.reduce_sum(_loss)
 
         # Make sure that batch normalization ops are updated
-        update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
+        update_ops = tf.compat.v1.get_collection(tf.compat.v1.GraphKeys.UPDATE_OPS)
 
         with tf.control_dependencies(update_ops):
-            train = tf.train.AdamOptimizer(learning_rate=lr).minimize(loss)
+            train = tf.compat.v1.train.AdamOptimizer(learning_rate=lr).minimize(loss)
 
         # Inputs
         self.training = training

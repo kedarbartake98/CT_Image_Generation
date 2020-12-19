@@ -243,7 +243,7 @@ def start_policy_training(cluster_dict, make_reward_predictor, gen_segments,
     def f():
         reward_predictor = make_reward_predictor('a2c', cluster_dict)
         misc_logs_dir = osp.join(log_dir, 'a2c_misc')
-        easy_tf_log.set_dir(misc_logs_dir)
+        # easy_tf_log.set_dir(misc_logs_dir)
         learn(
             policy=policy_fn,
             env=env,

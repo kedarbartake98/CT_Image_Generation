@@ -12,12 +12,14 @@ class MlpPolicy(object):
                  nsteps,
 #                  nstack,
                  reuse=False):
-        nbatch = nenv*nsteps
-        nh = ob_space.shape
+        nbatch = nenv*nsteps  # define nsteps = 25 not 1
+        nh = ob_space.shape[0]
+        # print('NBAAAAAAAAAAAAAtCCCCCHHHHHHHH' + str(nbatch))
+        # print('NBAAAAAAAAAAAAAtCCCCCHHHHHHHH' + str(nh))
         ob_shape = (nbatch, nh)
         nact = ac_space.n
-        X = tf.placeholder(tf.uint8, ob_shape)  # obs
-        with tf.variable_scope("model", reuse=reuse):
+        X = tf.compat.v1.placeholder(tf.float32, ob_shape)  # obs
+        with tf.compat.v1.variable_scope("model", reuse=reuse):
             x = tf.cast(X, tf.float32)
 
             # Only look at the most recent frame

@@ -5,7 +5,7 @@ from collections import deque
 from scipy.interpolate import splprep, splev
 
 def sample(logits):
-    noise1 = tf.random_uniform(tf.shape(logits))
+    noise1 = tf.compat.v1.random_uniform(tf.shape(logits))
 #     noise2 = tf.random_uniform(tf.shape(logits))
     # the values should be random in the beginning, so should be different
     # in the beginning before returning usually the same actions for both
@@ -13,15 +13,15 @@ def sample(logits):
     # maybe just use sequence of actions as different output (8 actions = 8 output)
     # maybe don't use this framework at all and do the alternate classifier training ( seperate 
     # usual cnns) and reinforcement learning.
-    return tf.argmax(logits - tf.log(-tf.log(3*noise1)), 1)#,
+    return tf.compat.v1.argmax(logits - tf.compat.v1.log(-tf.compat.v1.log(3*noise1)), 1)#,
 #             tf.argmax(logits - tf.log(-tf.log(noise2)), 1)
 
 
 def fc(x, scope, nh, act=tf.nn.relu, init_scale=1.0):
-    with tf.variable_scope(scope):
-        nin = x.get_shape()[1].value
-        w = tf.get_variable("w", [nin, nh], initializer=ortho_init(init_scale))
-        b = tf.get_variable("b", [nh], initializer=tf.constant_initializer(0.0))
+    with tf.compat.v1.variable_scope(scope):
+        nin = x.get_shape()[1]
+        w = tf.compat.v1.get_variable("w", [nin, nh], initializer=ortho_init(init_scale))
+        b = tf.compat.v1.get_variable("b", [nh], initializer=tf.constant_initializer(0.0))
         z = tf.matmul(x, w)+b
         h = act(z)
         return h
@@ -48,7 +48,7 @@ def cat_entropy(logits):
     ea0 = tf.exp(a0)
     z0 = tf.reduce_sum(ea0, 1, keepdims=True)
     p0 = ea0 / z0
-    return tf.reduce_sum(p0 * (tf.log(z0) - a0), 1)
+    return tf.reduce_sum(p0 * (tf.compat.v1.log(z0) - a0), 1)
 
 # def cat_entropy_softmax(p0):
 #     return - tf.reduce_sum(p0 * tf.log(p0 + 1e-6), axis = 1)
@@ -57,8 +57,8 @@ def mse(pred, target):
     return tf.square(pred-target)/2.
 
 def find_trainable_variables(key):
-    with tf.variable_scope(key):
-        return tf.trainable_variables()
+    with tf.compat.v1.variable_scope(key):
+        return tf.compat.v1.trainable_variables()
 
 def discount_with_dones(rewards, dones, gamma):
     discounted = []

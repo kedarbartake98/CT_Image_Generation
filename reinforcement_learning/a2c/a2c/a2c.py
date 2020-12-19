@@ -34,7 +34,8 @@ class Model(object):
 #             intra_op_parallelism_threads=num_procs,
 #             inter_op_parallelism_threads=num_procs)
 #         config.gpu_options.allow_growth = True
-#         sess = tf.Session(config=config)
+        tf.compat.v1.disable_eager_execution()
+        sess = tf.compat.v1.Session()
         nbatch = nenvs * nsteps   # = 5
 
         A = tf.compat.v1.placeholder(tf.int32, [nbatch])
@@ -59,7 +60,7 @@ class Model(object):
         if max_grad_norm is not None:
             grads, grad_norm = tf.clip_by_global_norm(grads, max_grad_norm)
         grads = list(zip(grads, params))
-        trainer = tf.train.RMSPropOptimizer(
+        trainer = tf.compat.v1.train.RMSPropOptimizer(
             learning_rate=LR, decay=alpha, epsilon=epsilon)
         _train = trainer.apply_gradients(grads)
 
@@ -96,9 +97,9 @@ class Model(object):
         # So that the plain-text 'checkpoint' file written uses relative paths,
         # which seems to be needed in order to avoid confusing saver.restore()
         # when restoring from FloydHub runs.
-        self.saver = tf.train.Saver(
+        self.saver = tf.compat.v1.train.Saver(
             max_to_keep=1, var_list=params, save_relative_paths=True)
-        tf.global_variables_initializer().run(session=sess)
+        tf.compat.v1.global_variables_initializer().run(session=sess)
 
     def load(self, ckpt_path):
         self.saver.restore(self.sess, ckpt_path)
@@ -114,7 +115,7 @@ class Runner(object):  # Trains workers, does actions etc and pushed clips for p
                  model,
                  nsteps,
 #                  nstack,
-#                  gamma,
+                 gamma,
                  gen_segments,
                  seg_pipe,
                  reward_predictor#,
@@ -124,7 +125,7 @@ class Runner(object):  # Trains workers, does actions etc and pushed clips for p
         self.model = model
 #         nh, nw, nc = env.observation_space.shape
         nh = env.observation_space.shape[0]
-        nenv = env.num_envs # 8 
+        nenv = env.nenvs # 8 
 #         self.batch_ob_shape = (nenv * nsteps, nh, nw, nc * nstack) nstack  = 1, 
 #         since we are not looking back 4 frames
         self.batch_ob_shape = (nenv * nsteps, nh)
@@ -133,7 +134,7 @@ class Runner(object):  # Trains workers, does actions etc and pushed clips for p
 #         # with the last frame coming from env.reset().
         self.obs, self.states = env.reset()
 #         self.update_obs(obs)
-#         self.gamma = gamma
+        self.gamma = gamma
         self.nsteps = nsteps
 #         self.states = model.initial_state
         self.dones = [False for _ in range(nenv)]  # [0]
@@ -197,7 +198,7 @@ class Runner(object):  # Trains workers, does actions etc and pushed clips for p
 #                 self.episode_frames = []
 
     def run(self):
-        nenvs = len(self.env.remotes)
+        nenvs = self.env.nenvs
         mb_obs, mb_states, mb_rewards, mb_actions, mb_values, mb_dones = \
             [], [], [], [], [], []
 #         mb_states = self.states

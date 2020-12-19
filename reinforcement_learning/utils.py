@@ -224,7 +224,7 @@ def get_normalized_organ_data(samples):
             orgs[i].append(np.array(org).tolist())
             
     for org in range(6):
-        organ = np.array(orgs[0])
+        organ = np.array(orgs[org])
         org_nor_est = preprocessing.MinMaxScaler()
         org_scaled = org_nor_est.fit_transform(organ)
         scaled_orgs.append(org_scaled)
@@ -232,7 +232,7 @@ def get_normalized_organ_data(samples):
         
     scaled_samples = []
     for i in range(len(scaled_orgs[0])):
-        scaled_img = [scaled_orgs[org][i].tolist() for org in range(6)]
+        scaled_img = [scaled_orgs[org][i] for org in range(6)]
         scaled_samples.append(scaled_img)
     
     return scaled_samples, org_est

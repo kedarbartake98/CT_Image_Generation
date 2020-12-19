@@ -1,6 +1,8 @@
 import argparse
 import gym
+from shapely.geometry import Polygon
 from gym import spaces
+from random import randrange
 from numpy.testing import assert_equal
 from reinforcement_learning.utils import get_normalized_organ_data, \
      load_componets, load_samples, get_first_grp_struct, \
@@ -52,7 +54,7 @@ class CustomEnv(gym.Env):
 
     def step(self, action):
         # Execute one time step within the environment
-        assert_equal(action.shape, (self.nenvs, 2))
+        assert_equal(action.shape, (self.nenvs,))
         self._take_action(action)
         self.current_step += 1
         if self.current_step > self.MAX_STEPS:  #RESET
@@ -75,22 +77,26 @@ class CustomEnv(gym.Env):
             else:
                 reward[env_n] = -1
         
-        self.norm_obs_st = np.append(self.torso_est.transform(self.torsos), self.const_arr, axis=1)
+        self.norm_obs_st = np.append(self.torso_est.transform(self.torsos), self.norm_const_arr, axis=1)
         self.state = np.append(self.input_imgs, self.torsos, axis=1)        
 #         reward = reward * delay_modifier
         return self.norm_obs_st, reward, done, self.state
     
     def reset(self):
         self.current_step = 0
-        self.selected_idx1 = np.random.randrange(len(self.samples))
-        self.selected_idx2 = np.random.randrange(len(self.samples))
-        self.int_level = np.random.randrange(3)
+        self.selected_idx1 = randrange(len(self.samples))
+        self.selected_idx2 = randrange(len(self.samples))
+        int_level = randrange(3)
         self.samples_img1 = self.samples[self.selected_idx1]
         self.samples_img2 = self.samples[self.selected_idx2]
-        self.samples_img1_chain = [ev for org in self.samples_img1 for ev in org]
-        self.samples_img2_chain = [ev for org in self.samples_img2 for ev in org]
-        self.input_imgs = np.asarray(samples_img1_chain.extend(samples_img2_chain).append(int_level))
-        self.input_imgs = np.expand_dims(self.norm_const_arr, axis=0).repeat(self.nenvs, 0)
+
+        samples_img1_chain = [ev for org in self.samples_img1 for ev in org]
+        samples_img2_chain = [ev for org in self.samples_img2 for ev in org]
+        samples_img1_chain.extend(samples_img2_chain)
+        samples_img1_chain.append(int_level)
+
+        self.input_imgs = np.asarray(samples_img1_chain)
+        self.input_imgs = np.expand_dims(self.input_imgs, axis=0).repeat(self.nenvs, 0)
         self.norm_samples_img1 = self.norm_samples[self.selected_idx1]
         self.norm_samples_img2 = self.norm_samples[self.selected_idx2]
 #         self.curves_img1 = self.curves[self.selected_idx1]
@@ -98,6 +104,7 @@ class CustomEnv(gym.Env):
         self.samples_int = [] 
         self.norm_samples_int = [] 
         for sample1,sample2 in zip(self.samples_img1[1:], self.samples_img2[1:]):
+            # print(sample1 + sample2)
             if int_level == 0:
                 self.samples_int.append(0.7*sample1 + 0.3*sample2)
             elif int_level == 1:
@@ -106,21 +113,22 @@ class CustomEnv(gym.Env):
                 self.samples_int.append(0.3*sample1 + 0.7*sample2)
         
         for sample1,sample2 in zip(self.norm_samples_img1[1:], self.norm_samples_img2[1:]):
+            # print(sample1 + sample2)
             if int_level == 0:
                 self.norm_samples_int.append(0.7*sample1 + 0.3*sample2)
             elif int_level == 1:
                 self.norm_samples_int.append(0.5*sample1 + 0.5*sample2)
             else:
                 self.norm_samples_int.append(0.3*sample1 + 0.7*sample2)
-        self.norm_samples_chain = [ev for org in self.norm_samples_int for ev in org]
+        norm_samples_chain = [ev for org in self.norm_samples_int for ev in org]
         if int_level == 0:
             self.norm_torsos = np.asarray(0.7*self.norm_samples_img1[0] + 0.3*self.norm_samples_img2[0])
         elif int_level == 1:
             self.norm_torsos = np.asarray(0.5*self.norm_samples_img1[0] + 0.5*self.norm_samples_img2[0])
         else:
             self.norm_torsos = np.asarray(0.3*self.norm_samples_img1[0] + 0.7*self.norm_samples_img2[0])
-        self.norm_torsos = np.expand_dims(self.torsos, axis=0)
-        self.norm_torsos = np.repeat(self.torsos, self.nenvs, 0)
+        self.norm_torsos = np.expand_dims(self.norm_torsos, axis=0)
+        self.norm_torsos = np.repeat(self.norm_torsos, self.nenvs, 0)
         self.torsos = self.torso_est.inverse_transform(self.norm_torsos) 
         
         self.curves_int = []
@@ -137,46 +145,50 @@ class CustomEnv(gym.Env):
         self.spinalcord = Polygon([self.curves_int[3][index] for index in self.co_in45])
         self.esophagus = Polygon([self.curves_int[4][index] for index in self.co_in45])
         
-        assert_equal(self.torsos, (self.nenvs, 20))
+        assert_equal(self.torsos.shape, (self.nenvs, 20))
         norm_tor1 = self.norm_samples_img1[0]
         norm_tor2 = self.norm_samples_img2[0]
-        self.norm_const_arr = np.asarray(norm_samples_chain.extend(norm_tor1).extend(norm_tor2).append(int_level))
+        norm_samples_chain.extend(norm_tor1)
+        norm_samples_chain.extend(norm_tor2)
+        norm_samples_chain.append(int_level)
+
+        self.norm_const_arr = np.asarray(norm_samples_chain)
         self.norm_const_arr = np.expand_dims(self.norm_const_arr, axis=0).repeat(self.nenvs, 0)
         self.norm_obs_st = np.append(self.norm_torsos, self.norm_const_arr, axis=1)
         self.state = np.append(self.input_imgs, self.torsos, axis=1)
-        assert_equal(self.norm_obs_st, (self.nenvs, 91))
-        
-        self.curves_torsos = np.matmul(np.asarray(self.estimators[0].components_),
-                                      self.torsos) + \
-                                    np.asarray(self.estimators[0].mean_).repeat(self.nenvs, 0)
-        assert_equal(curves_torsos, (self.nenvs, 72)) # len self.estimators[0].components_[0]
+        assert_equal(self.norm_obs_st.shape, (self.nenvs, 91))
+        self.curves_torsos = np.matmul(self.torsos, np.asarray(self.estimators[0].components_)
+                                      ) + \
+                                    np.expand_dims(np.asarray(self.estimators[0].mean_), axis=0).repeat(self.nenvs, 0)
+        assert_equal(self.curves_torsos.shape, (self.nenvs, 72)) # len self.estimators[0].components_[0]
 
         return self.norm_obs_st, self.state
 
     def _take_action(self, action):
         
-        assert_equal(action, (self.nenvs, 1))
-        eig_cmp = action[:,0] / 8  #[0....7,..,8]
-        eig_mod = action[:,1] % 8  #[0....7,....]
-        assert_equal(eig_cmp, (self.nenvs, ))
-        assert_equal(eig_mod, (self.nenvs, ))
+        assert_equal(action.shape, (self.nenvs, ))
+        eig_cmp = action[:] // 8  #[0....7,..,8]
+        eig_mod = action[:] % 8  #[0....7,....]
+        assert_equal(eig_cmp.shape, (self.nenvs, ))
+        assert_equal(eig_mod.shape, (self.nenvs, ))
 #         if eig_cmp != 8:
         tor1_ev = np.asarray(self.samples_img1)[0][eig_cmp]
         tor2_ev = np.asarray(self.samples_img2)[0][eig_cmp]
         tor3_ev = self.torsos[range(self.nenvs),eig_cmp]
-        assert_equal(tor1_ev, (self.nenvs, ))
-        assert_equal(tor2_ev, (self.nenvs, ))
-        assert_equal(tor3_ev, (self.nenvs, ))
-        max_ev = max_list[eig_cmp]
-        min_ev = min_list[eig_cmp]
-        assert_equal(max_ev, (self.nenvs, ))
-        assert_equal(min_ev, (self.nenvs, ))
+        assert_equal(tor1_ev.shape, (self.nenvs, ))
+        assert_equal(tor2_ev.shape, (self.nenvs, ))
+        assert_equal(tor3_ev.shape, (self.nenvs, ))
+        max_ev = self.max_list[0][eig_cmp]
+        min_ev = self.min_list[0][eig_cmp]
+        assert_equal(max_ev.shape, (self.nenvs, ))
+        assert_equal(min_ev.shape, (self.nenvs, ))
         eig_mod_01 = eig_mod % 2
         em = np.where(eig_mod_01==0, 0.1, 0.3)
         em = np.where(eig_cmp==8, 0, em)
-        emv = np.where(int(eig_mod / 2) % 4==0, min_ev, max_ev)
-        emv = np.where(int(eig_mod / 2) % 4==1, tor1_ev, emv)
-        emv = np.where(int(eig_mod / 2) % 4==2, tor2_ev, emv)
+        print('AAAAAAAAAAAA')
+        emv = np.where((eig_mod // 2) % 4==0, min_ev, max_ev)
+        emv = np.where((eig_mod // 2) % 4==1, tor1_ev, emv)
+        emv = np.where((eig_mod // 2) % 4==2, tor2_ev, emv)
         new_ev = emv*em + tor3_ev*(1 - em)
 #             modif = [min_ev, tor1_ev, tor2_ev, max_ev]
 #             if eig_mod % 2 == 0:
@@ -187,8 +199,8 @@ class CustomEnv(gym.Env):
 #             self.samples_chain[eig_cmp] = new_ev
         self.torsos[range(self.nenvs),eig_cmp] = new_ev
     
-        self.curves_torsos = np.matmul(np.asarray(self.estimators[0].components_),
-                                  self.torsos) + \
-                                np.asarray(self.estimators[0].mean_).repeat(self.nenvs, 0)
-        assert_equal(curves_torsos, (self.nenvs, 72)) # len self.estimators[0].components_[0]
+        self.curves_torsos = np.matmul(self.torsos, np.asarray(self.estimators[0].components_)
+                                      ) + \
+                                    np.expand_dims(np.asarray(self.estimators[0].mean_), axis=0).repeat(self.nenvs, 0)
+        assert_equal(self.curves_torsos.shape, (self.nenvs, 72)) # len self.estimators[0].components_[0]
         # ??? maybe made faster by add/sub

@@ -23,17 +23,19 @@ def get_prefs_from_frontend(pref_dicts, pref_pipe):
 	pass
 
 
-def send_segs_to_frontend(segments, seg_pipe):
+def send_segs_to_frontend(seg_pipe):
 	'''
 	Process the segments received from RL agents and send them to frontend
 	Agents will put the generated segments in the pipe/Queue
 	This function will pick them up from the Queue, process them, and send them
 	to frontend
 	'''
+	print('#'*100)
+	print("SEND SEGMENTS CALLED ..")
 
 	# Pick up segments from seg_pipe
 	segments = seg_pipe.get()
-
+	
 	# Process segments
 	pass
 

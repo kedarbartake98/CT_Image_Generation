@@ -1,3 +1,19 @@
+window.onload = function()
+{
+	set_black_images();
+}
+
+function set_black_images()
+{
+	var img_tags = document.getElementsByTagName('img');
+
+	for (var i=0; i< img_tags.length; i++)
+	{
+		// img_tags[i].src="{{url_for('static', filename='black_image.jpeg')}}";
+		img_tags[i].src = "static/black_image.jpeg";
+	}
+}
+
 // Implement the slider increment decrement fuinctionality
  
 function increment_slider()

@@ -55,7 +55,7 @@
     </style>
 
   </head>
-
+  <title>CT Image generation using Reinforcement Learning</title>
   <body>
  <div class="container-fluid" style="background-color:  #303030">
      <div class="row">
@@ -168,16 +168,16 @@
      <div class="row mb-2">
          <div class='col-2'> 
             
-            <div class="row mb-3">
+            <div class="row mb-1">
                 <div class="col-12" style="text-align:center; background-color:lightgray;">
                     <div class="row">
                         <div class="col"> <b>Select Instance</b> </div>
                         <div class="col">
-                               <button type="button" class="btn btn-primary btn-block"><b> < </b></button>
+                               <button type="button" id="prev_sample" class="btn btn-primary btn-block" onclick="select_prev_sample()"><b> < </b></button>
                              </div>
 
                              <div class="col">
-                              <button type="button" class="btn btn-primary btn-block"><b> > </b></button>
+                              <button type="button" id="next_sample" class="btn btn-primary btn-block" onclick="select_next_sample()"><b> > </b></button>
                              </div>     
                         </div>
                     </div>
@@ -245,9 +245,15 @@
                 </div>
             </div>
 
-            <div class="row mb-3">
+            <div class="row mb-1">
                 <div class="col-12">
                     <button type="button" class="btn btn-primary btn-block"> <b>Submit Preferences</b></button>
+                </div>
+            </div>
+
+            <div class="row mb-1">
+                <div class="col-12">
+                    <button type="button" class="btn btn-primary btn-block"> <b>Done</b></button>
                 </div>
             </div>
 

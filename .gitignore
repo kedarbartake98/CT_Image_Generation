@@ -6,6 +6,7 @@
 *.zip
 *.DS_Store
 *.mat
+*.pkl
 logs/*
 data/pgnn/pgnn/main.py
 data/pgnn/pgnn/man.py

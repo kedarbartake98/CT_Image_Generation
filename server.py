@@ -139,13 +139,11 @@ if __name__=='__main__':
 	seg_pipe, pref_pipe, start_policy_training_flag = initialize_comms()
 	comm_pipes = (seg_pipe, pref_pipe, start_policy_training_flag)
 
-	# TODO Arjun - set params in rl_init_params.py
-
 	# Calling the Reinforcement Learning Script
-	print('Starting Backend ..')
-	backend_process = Process(target=start_backend, args=(init_arg_tuple,
-														  comm_pipes))
-	backend_process.start()
+	# print('Starting Backend ..')
+	# backend_process = Process(target=start_backend, args=(init_arg_tuple,
+	# 													  comm_pipes))
+	# backend_process.start()
 
 	# Initializing Frontend
 	print('Rendering Web App ...')
@@ -154,4 +152,4 @@ if __name__=='__main__':
 
 
 	fr_end_process.join()
-	backend_process.join()
+	# backend_process.join()

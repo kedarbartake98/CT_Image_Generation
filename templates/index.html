@@ -61,21 +61,17 @@
      <div class="row">
          <!--<span class="border">-->
          <div class='col-6'>
-             <!-- Title row -->
+
              <div class='row mb-3'>
-                 <div class='col-3'>
-                     <button type="button" class="btn btn-primary btn-block">File</button>
-                 </div>
-                 <div class='col' style="text-align:center; background-color:lightgray;"> Sample Generation </div>
+                 <div class='col' style="text-align:center; background-color:lightgray;"><b> <i> Sample Generation</i></b> </div>
              </div>
+
              <div class='row'>
+
                  <div class='col-3'>
-                     <div class="row mb-3">
-                         <button type="button" class="btn btn-primary btn-block">Init</button>
-                     </div>
-                     <div class='row'></div>
+<!--                      <div class='row'></div> -->
                      <div class="row">
-                         <button type="button" class="btn btn-primary btn-block" onclick="generate()">Generate New Pair</button>
+                         <button type="button" class="btn btn-primary btn-block" onclick="generate()">Generate Samples</button>
                      </div>
 
                  </div>
@@ -131,7 +127,7 @@
          <div class='col-3'>
              
              <div class="row mb-3"> 
-                <div class='col' style="text-align:center; background-color:lightgray;"> Sample Completion</div>
+                <div class='col' style="text-align:center; background-color:lightgray;"> <b><i>Sample Completion</i></b> </div>
              </div>
 
              <div class="row mb-3">
@@ -158,32 +154,30 @@
          </div>
          <div class='col-3'>
              <div class="row mb-3">
-                <div class='col' style="text-align:center; background-color:lightgray;"> Database Statistics </div>
+                <div class='col' style="text-align:center; background-color:lightgray;"> <b><i> Database Statistics</i> </b>
+                 </div>
              </div>
              <div class="row mb-3">Graphs</div>
          </div>
      </div>
      <!-- First Row done -->
 <div class="row mb-3"> 
-    <div class='col' style="text-align:center; background-color:lightgray;">Sample Neighborhood Enrichment</div>
+    <div class='col' style="text-align:center; background-color:lightgray;"> <b><i>Sample Neighborhood Enrichment</i> </b> 
+    </div>
 </div>
      <div class="row">
          <div class='col-2'> 
             
             <div class="row mb-3">
-                <button type="button" class="btn btn-primary btn-block">Generate Samples</button>
-            </div>
-
-            <div class="row mb-3">
                 <div class="col-12" style="text-align:center; background-color:lightgray;">
                     <div class="row">
-                        <div class="col">Select Instance</div>
+                        <div class="col"> <b>Select Instance</b> </div>
                         <div class="col">
-                               <button type="button" class="btn btn-primary btn-block"><</button>
+                               <button type="button" class="btn btn-primary btn-block"><b> < </b></button>
                              </div>
 
                              <div class="col">
-                              <button type="button" class="btn btn-primary btn-block">></button>
+                              <button type="button" class="btn btn-primary btn-block"><b> > </b></button>
                              </div>     
                         </div>
                     </div>
@@ -192,64 +186,68 @@
             <div class="row mb-3">
 
                 <div class="col-6">
-                    <button type="button" class="btn btn-primary btn-block">Accept</button>
+                    <button type="button" class="btn btn-primary btn-block"><b>Accept</b></button>
                 </div>
             
                 <div class="col-6">
-                    <button type="button" class="btn btn-danger btn-block">Reject</button>        
+                    <button type="button" class="btn btn-danger btn-block"> <b>Reject</b></button>        
                 </div>
 
             </div>
 
-            <div class="row mb-3" style="text-align:center; background-color:lightgray;">
-                <div class="col">
-                    <button type="button" class="btn btn-primary btn-block">All</button>
+            <div class="row mb-3">
+                <div class="col-6">
+                    <button type="button" class="btn btn-primary btn-block"><b>Torso</b></button>
                 </div>
-                <div class="col">
-                    Components
-                </div>
-                <div class="col">
-                    <button type="button" class="btn btn-danger btn-block">All</button>
+            
+                <div class="col-6">
+                    <button type="button" class="btn btn-danger btn-block"><b>Torso</b></button>        
                 </div>
             </div>
 
             <div class="row mb-3">
                 <div class="col-6">
-                    <button type="button" class="btn btn-primary btn-block">Lung</button>
+                    <button type="button" class="btn btn-primary btn-block"> <b>Left Lung</b></button>
                 </div>
             
                 <div class="col-6">
-                    <button type="button" class="btn btn-danger btn-block">Lung</button>        
+                    <button type="button" class="btn btn-danger btn-block"><b>Left Lung</b></button>        
                 </div>
             </div>
 
             <div class="row mb-3">
                 <div class="col-6">
-                    <button type="button" class="btn btn-primary btn-block">Spine</button>
+                    <button type="button" class="btn btn-primary btn-block"><b>Right Lung</b></button>
                 </div>
             
                 <div class="col-6">
-                    <button type="button" class="btn btn-danger btn-block">Spine</button>        
+                    <button type="button" class="btn btn-danger btn-block"><b>Right Lung</b></button>       
                 </div>
             </div>
 
             <div class="row mb-3">
                 <div class="col-6">
-                    <button type="button" class="btn btn-primary btn-block">Torso</button>
+                    <button type="button" class="btn btn-primary btn-block"><b>Spine</b></button>
                 </div>
             
                 <div class="col-6">
-                    <button type="button" class="btn btn-danger btn-block">Torso</button>        
+                    <button type="button" class="btn btn-danger btn-block"><b>Spine</b></button>        
                 </div>
             </div>
 
-            <div class="row mb-1">
+            <div class="row mb-3">
                 <div class="col-6">
-                    <button type="button" class="btn btn-primary btn-block">Heart</button>
+                    <button type="button" class="btn btn-primary btn-block"><b>Heart</b></button>
                 </div>
             
                 <div class="col-6">
-                    <button type="button" class="btn btn-danger btn-block">Heart</button>        
+                    <button type="button" class="btn btn-danger btn-block"><b>Heart</b></button>        
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-12">
+                    <button type="button" class="btn btn-primary btn-block"> <b>Submit Preferences</b></button>
                 </div>
             </div>
 

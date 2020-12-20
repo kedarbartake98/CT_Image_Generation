@@ -3,6 +3,8 @@ import numpy as np
 import tensorflow as tf
 from collections import deque
 from scipy.interpolate import splprep, splev
+from sklearn.decomposition import PCA
+
 
 def sample(logits):
     noise1 = tf.compat.v1.random_uniform(tf.shape(logits))

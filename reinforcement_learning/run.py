@@ -71,11 +71,11 @@ def run(general_params,
 #             episode_vid_queue=episode_vid_queue,
             log_dir=general_params['log_dir'],
             a2c_params=a2c_params)
-        # pi, pi_proc = start_pref_interface(   # gather preferences through interface
-        #     seg_pipe=seg_pipe,
-        #     pref_pipe=pref_pipe,
-        #     log_dir=general_params['log_dir'],
-        #     **pref_interface_params)
+        pi, pi_proc = start_pref_interface(   # gather preferences through interface
+            seg_pipe=seg_pipe,
+            pref_pipe=pref_pipe,
+            log_dir=general_params['log_dir'])#,
+            # **pref_interface_params)
 
         n_train = general_params['max_prefs'] * (1 - PREFS_VAL_FRACTION)
         n_val = general_params['max_prefs'] * PREFS_VAL_FRACTION
@@ -260,20 +260,20 @@ def start_policy_training(cluster_dict, make_reward_predictor, gen_segments,
     return env, proc
 
 
-def start_pref_interface(seg_pipe, pref_pipe, max_segs, synthetic_prefs,   #Front-end
+def start_pref_interface(seg_pipe, pref_pipe,
                          log_dir):
     def f():
         # The preference interface needs to get input from stdin. stdin is
         # automatically closed at the beginning of child processes in Python,
         # so this is a bit of a hack, but it seems to be fine.
         sys.stdin = os.fdopen(0)
+        print('PREF')
+        # print(PREF)
         pi.run(seg_pipe=seg_pipe, pref_pipe=pref_pipe)
 
     # Needs to be done in the main process because does GUI setup work
     prefs_log_dir = osp.join(log_dir, 'pref_interface')
-    pi = PrefInterface(synthetic_prefs=synthetic_prefs,
-                       max_segs=max_segs,
-                       log_dir=prefs_log_dir)
+    pi = PrefInterface()
     proc = Process(target=f, daemon=True)
     proc.start()
     return pi, proc

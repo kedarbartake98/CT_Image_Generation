@@ -10,6 +10,7 @@ import time
 from itertools import combinations
 from multiprocessing import Queue
 from random import shuffle
+from reinforcement_learning.utils import vector_to_image
 
 import easy_tf_log
 import numpy as np
@@ -19,22 +20,22 @@ import numpy as np
 
 class PrefInterface:
 
-    def __init__(self, synthetic_prefs, max_segs, log_dir): # synthetic_prefs ???
-        self.vid_q = Queue()
-        if not synthetic_prefs:
-            pass
-            ### start your custom interface 
-#             self.renderer = VideoRenderer(vid_queue=self.vid_q,
-#                                           mode=VideoRenderer.restart_on_get_mode,
-#                                           zoom=4)
-        else:
-            self.renderer = None
-        self.synthetic_prefs = synthetic_prefs
+    def __init__(self): # synthetic_prefs ???
+#         self.vid_q = Queue()
+#         if not synthetic_prefs:
+#             pass
+#             ### start your custom interface 
+# #             self.renderer = VideoRenderer(vid_queue=self.vid_q,
+# #                                           mode=VideoRenderer.restart_on_get_mode,
+# #                                           zoom=4)
+#         else:
+#             self.renderer = None
+        # self.synthetic_prefs = synthetic_prefs
         self.seg_idx = 0
         self.segments = []
         self.tested_segment = set()  # For O(1) lookup
-        self.max_segs = max_segs
-        easy_tf_log.set_dir(log_dir)
+        # self.max_segs = max_segs
+        # easy_tf_log.set_dir(log_dir)
 
     def stop_renderer(self):
         if self.renderer:
@@ -43,11 +44,47 @@ class PrefInterface:
     def run(self, seg_pipe, pref_pipe):
         while len(self.segments) < 8: #2: receive 8 segements at a time
             print("Preference interface waiting for segments")
+            print("Preference interface waiting for segments")
+            print("Preference interface waiting for segments")
+            print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+            print(len(self.segments))
             time.sleep(5.0)
             self.recv_segments(seg_pipe)
 
+        print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA2")
+        print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA2")
+        print(len(self.segments))
+        print(self.segments[0].frames[24])
+        print(self.segments[1].frames[24])
+        print(self.segments[2].frames[24])
+        print(self.segments[3].frames[24])
+        print(self.segments[7].frames[24])
+        # print(len(self.segments[0].frames))
+        vector_img_1 = self.segments[0].frames[24][:50]
+        vector_img_2 = self.segments[0].frames[24][50:100]
+        vector_img_middle = [] 
+        int_lvl = self.segments[0].frames[24][100]
+        if int_level == 0:
+            vector_img_middle = 0.7*vector_img_1 + 0.3*vector_img_2  # for slider at 0.3
+        elif int_level == 1:
+            vector_img_middle = 0.5*vector_img_1 + 0.5*vector_img_2
+        else:
+            vector_img_middle = 0.3*vector_img_1 + 0.7*vector_img_2
+
+        img1 = vector_to_image(vector_img_1)
+        img2 = vector_to_image(vector_img_2)
+        img_mid = vector_to_image(vector_img_middle)
+        
+        eight_images = []    
+        for seg in self.segments:
+            torso = seg.frames[24][101:]
+            torso.extend(vector_img_middle[20:])
+            eight_images.append(vector_to_image(torso))
+        
+
+
         while True:
-#             seg_pair = None
+            seg_eight = None
             while seg_eight is None:
                 try:
                     seg_eight = self.sample_seg_eight()
@@ -110,17 +147,20 @@ class PrefInterface:
         while time.time() - start_time < max_wait_seconds:
             try:
                 segment = seg_pipe.get(block=True, timeout=max_wait_seconds)
+                # print(len(segment.rewards))
+                # print(len(segment.frames))
+                # print(smfls)
             except queue.Empty:
                 return
-            if len(self.segments) < self.max_segs:
+            if len(self.segments) < 20000: #self.max_segs:
                 self.segments.append(segment)
             else:
                 self.segments[self.seg_idx] = segment
                 self.seg_idx = (self.seg_idx + 1) % self.max_segs
             n_recvd += 1
-        easy_tf_log.tflog('segment_idx', self.seg_idx)
-        easy_tf_log.tflog('n_segments_rcvd', n_recvd)
-        easy_tf_log.tflog('n_segments', len(self.segments))
+        # easy_tf_log.tflog('segment_idx', self.seg_idx)
+        # easy_tf_log.tflog('n_segments_rcvd', n_recvd)
+        # easy_tf_log.tflog('n_segments', len(self.segments))
 
     def sample_seg_eight(self):
         """

@@ -80,6 +80,9 @@ class CustomEnv(gym.Env):
         self.norm_obs_st = np.append(self.torso_est.transform(self.torsos), self.norm_const_arr, axis=1)
         self.state = np.append(self.input_imgs, self.torsos, axis=1)        
 #         reward = reward * delay_modifier
+        # print('NORM OBS222')
+        # print(self.norm_obs_st)
+        # print(self.state)
         return self.norm_obs_st, reward, done, self.state
     
     def reset(self):
@@ -162,6 +165,9 @@ class CustomEnv(gym.Env):
                                     np.expand_dims(np.asarray(self.estimators[0].mean_), axis=0).repeat(self.nenvs, 0)
         assert_equal(self.curves_torsos.shape, (self.nenvs, 72)) # len self.estimators[0].components_[0]
 
+        # print('NORM OBS')
+        # print(self.norm_obs_st)
+        # print(self.state)
         return self.norm_obs_st, self.state
 
     def _take_action(self, action):
@@ -185,7 +191,7 @@ class CustomEnv(gym.Env):
         eig_mod_01 = eig_mod % 2
         em = np.where(eig_mod_01==0, 0.1, 0.3)
         em = np.where(eig_cmp==8, 0, em)
-        print('AAAAAAAAAAAA')
+        # print('AAAAAAAAAAAA')
         emv = np.where((eig_mod // 2) % 4==0, min_ev, max_ev)
         emv = np.where((eig_mod // 2) % 4==1, tor1_ev, emv)
         emv = np.where((eig_mod // 2) % 4==2, tor2_ev, emv)

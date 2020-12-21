@@ -56,6 +56,7 @@ function highlight_sample(img_tag_id, color)
 
 function remove_highlight(img_tag_id)
 {
+	console.log("REMOVING HIGHLIGHT");
 	document.getElementById(img_tag_id).style.border="";
 }
 
@@ -163,10 +164,75 @@ function select_next_sample()
 
 function submit_pref()
 {
-	pref_dict[curr_sample] = curr_pref;
-	highlight_sample(samples[curr_sample], colors['green']);
+	console.log("Submit PREF");
+	console.log(curr_pref);
+
+	if (Object.keys(curr_pref).length<6)
+	{
+		alert("Choose options for all organs before submitting ...");
+	}
+	else
+	{
+		pref_dict[curr_sample+1] = curr_pref; 
+		highlight_sample(samples[curr_sample], colors['green']);	
+	}
+
+}
+
+function submit_final_pref_set()
+{
+	console.log(pref_dict);
+	if (Object.keys(pref_dict).length == 8)
+	{
+		// send prefs to backend
+	}
+
+	else
+	{
+		alert("You must submit prefs for all samples before proceeeding");
+	}
 }
 // #############################################################################
+
+var pref_names = ["Accept/Reject", "Torso", "Left Lung", "Right Lung", "Spine", "Heart"]; 
+
+function get_pref_value(radio_name)
+{
+	var selected =	document.querySelector('input[name="'+radio_name+'"]:checked');
+	console.log("Value for radio "+radio_name+" "+selected.value);
+
+	if (selected!=null)
+	{
+		return selected.value;
+	}
+	else
+	{
+		return null;
+	}
+}
+
+function gather_preferences()
+{
+	curr_pref = {};
+
+	for (var i=0; i<pref_names.length; i++)
+	{
+		// sample_number = sample_mapping[samples[curr_sample]];
+
+		for (var i=0; i<pref_names.length; i++)
+		{
+			var pref = get_pref_value(pref_names[i]);
+
+			if (pref != null)
+			{
+				curr_pref[pref_names[i]] = pref;
+			}
+		}
+
+		submit_pref();
+		console.log('Submitted Pref ' + curr_pref);
+	}
+}
 
 // Implement the slider increment decrement functionality
  

@@ -36,7 +36,8 @@ function set_black_images()
 
 function reset_prefs()
 {
-	$('input[type="checkbox"]:checked').prop('checked',false);
+	// console.log("CLEAR CHECKBOXES");
+	$('input[type=radio]').prop('checked',false);
 }
 
 function clear_pref_dict()
@@ -60,6 +61,11 @@ function remove_highlight(img_tag_id)
 	document.getElementById(img_tag_id).style.border="";
 }
 
+function set_slider_value(value)
+{
+	document.getElementById("pca_slider").value = value;
+}
+
 // #############################################################################
 
 window.onload = function()
@@ -69,6 +75,7 @@ window.onload = function()
 	clear_pref_dict();
 	reset_slider();
 	highlight_sample('sample_1', colors['blue']);
+	set_slider_value(30);
 }
 
 // function check_curr_pref()
@@ -156,6 +163,10 @@ function select_next_sample()
 		{
 			remove_highlight(samples[curr_sample]);
 		}
+		else
+		{
+			highlight_sample(samples[curr_sample], colors['green']);
+		}
 
 		curr_sample += 1;
 		highlight_sample(samples[curr_sample], colors['blue']);
@@ -174,7 +185,8 @@ function submit_pref()
 	else
 	{
 		pref_dict[curr_sample+1] = curr_pref; 
-		highlight_sample(samples[curr_sample], colors['green']);	
+		highlight_sample(samples[curr_sample], colors['green']);
+		reset_prefs();	
 	}
 
 }
@@ -199,10 +211,10 @@ var pref_names = ["Accept/Reject", "Torso", "Left Lung", "Right Lung", "Spine", 
 function get_pref_value(radio_name)
 {
 	var selected =	document.querySelector('input[name="'+radio_name+'"]:checked');
-	console.log("Value for radio "+radio_name+" "+selected.value);
 
 	if (selected!=null)
 	{
+		console.log("Value for radio "+radio_name+" "+selected.value);
 		return selected.value;
 	}
 	else

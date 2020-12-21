@@ -55,27 +55,23 @@
     </style>
 
   </head>
-
+  <title>CT Image generation using Reinforcement Learning</title>
   <body>
- <div class="container-fluid">
+ <div class="container-fluid" style="background-color:  #303030">
      <div class="row">
          <!--<span class="border">-->
          <div class='col-6'>
-             <!-- Title row -->
+
              <div class='row mb-3'>
-                 <div class='col-3'>
-                     <button type="button" class="btn btn-primary btn-block">File</button>
-                 </div>
-                 <div class='col' style="text-align:center; background-color:lightgray;"> Sample Generation </div>
+                 <div class='col' style="text-align:center; background-color:black;"><p style="color: white; font-weight:bold; vertical-align: center; font-size: 110%"> Sample Generation</p> </div>
              </div>
+
              <div class='row'>
+
                  <div class='col-3'>
-                     <div class="row mb-3">
-                         <button type="button" class="btn btn-primary btn-block">Init</button>
-                     </div>
-                     <div class='row'></div>
+<!--                      <div class='row'></div> -->
                      <div class="row">
-                         <button type="button" class="btn btn-primary btn-block" onclick="generate()">Generate New Pair</button>
+                         <button type="button" class="btn btn-primary btn-block" onclick="generate()">Generate Samples</button>
                      </div>
 
                  </div>
@@ -131,13 +127,13 @@
          <div class='col-3'>
              
              <div class="row mb-3"> 
-                <div class='col' style="text-align:center; background-color:lightgray;"> Sample Completion</div>
+                <div class='col' style="text-align:center; background-color:black;"> <p style="color: white; font-weight:bold; vertical-align: center; font-size: 110%"> Sample Completion <p> </div>
              </div>
 
              <div class="row mb-3">
 
                  <div class="col-9">
-                   <img id="source" class="rounded mx-auto d-block" alt="..." width="300" height="300" style="width:300px height=300px">
+                   <img id="source" class="rounded mx-auto d-block" alt="..." width="250" height="250" style="width:200px height=200px">
                  </div>
 
                  <div class="col-3">
@@ -157,33 +153,31 @@
              </div>
          </div>
          <div class='col-3'>
-             <div class="row mb-3">
-                <div class='col' style="text-align:center; background-color:lightgray;"> Database Statistics </div>
+             <div class="row mb-1">
+                <div class='col' style="text-align:center; background-color:black;"> <p style="color: white; font-weight:bold; vertical-align: center; font-size: 110%">Database Statistics</p>
+                 </div>
              </div>
-             <div class="row mb-3">Graphs</div>
+             <div class="row mb-1">Graphs</div>
          </div>
      </div>
      <!-- First Row done -->
-<div class="row mb-3"> 
-    <div class='col' style="text-align:center; background-color:lightgray;">Sample Neighborhood Enrichment</div>
+<div class="row mb-1"> 
+    <div class='col' style="text-align:center; background-color:black;"> <p style="color: white; font-weight:bold; vertical-align: center; font-size: 120%">Sample Neighborhood Enrichment</p>  
+    </div>
 </div>
-     <div class="row">
+     <div class="row mb-2">
          <div class='col-2'> 
             
-            <div class="row mb-3">
-                <button type="button" class="btn btn-primary btn-block">Generate Samples</button>
-            </div>
-
-            <div class="row mb-3">
+            <div class="row mb-1">
                 <div class="col-12" style="text-align:center; background-color:lightgray;">
                     <div class="row">
-                        <div class="col">Select Instance</div>
+                        <div class="col"> <b>Select Instance</b> </div>
                         <div class="col">
-                               <button type="button" class="btn btn-primary btn-block"><</button>
+                               <button type="button" id="prev_sample" class="btn btn-primary btn-block" onclick="select_prev_sample()"><b> < </b></button>
                              </div>
 
                              <div class="col">
-                              <button type="button" class="btn btn-primary btn-block">></button>
+                              <button type="button" id="next_sample" class="btn btn-primary btn-block" onclick="select_next_sample()"><b> > </b></button>
                              </div>     
                         </div>
                     </div>
@@ -192,106 +186,116 @@
             <div class="row mb-3">
 
                 <div class="col-6">
-                    <button type="button" class="btn btn-primary btn-block">Accept</button>
+                    <button type="button" class="btn btn-success btn-block"><b>Accept</b> <input type="radio" name="Accept/Reject" value=0></button> </button>
                 </div>
             
                 <div class="col-6">
-                    <button type="button" class="btn btn-danger btn-block">Reject</button>        
+                    <button type="button" class="btn btn-danger btn-block"> <b>Reject</b> <input type="radio" name="Accept/Reject"  value=1> </button>        
                 </div>
 
             </div>
 
-            <div class="row mb-3" style="text-align:center; background-color:lightgray;">
-                <div class="col">
-                    <button type="button" class="btn btn-primary btn-block">All</button>
+            <div class="row mb-3">
+                <div class="col-6">
+                    <button type="button" class="btn btn-success btn-block"><b>Torso</b> <input type="radio" name="Torso"  value=0></button>
                 </div>
-                <div class="col">
-                    Components
-                </div>
-                <div class="col">
-                    <button type="button" class="btn btn-danger btn-block">All</button>
+            
+                <div class="col-6">
+                    <button type="button" class="btn btn-danger btn-block"><b>Torso</b> <input type="radio" name="Torso" value=1> </button>        
                 </div>
             </div>
 
             <div class="row mb-3">
                 <div class="col-6">
-                    <button type="button" class="btn btn-primary btn-block">Lung</button>
+                    <button type="button" class="btn btn-success btn-block"> <b>Lung (L)</b> <input type="radio" name="Left Lung" value=0></button>
                 </div>
             
                 <div class="col-6">
-                    <button type="button" class="btn btn-danger btn-block">Lung</button>        
+                    <button type="button" class="btn btn-danger btn-block"><b>Lung (L)</b> <input type="radio" name="Left Lung"  value=1> </button>        
                 </div>
             </div>
 
             <div class="row mb-3">
                 <div class="col-6">
-                    <button type="button" class="btn btn-primary btn-block">Spine</button>
+                    <button type="button" class="btn btn-success btn-block"><b>Lung (R)</b> <input type="radio" name="Right Lung" value=0></button>
                 </div>
             
                 <div class="col-6">
-                    <button type="button" class="btn btn-danger btn-block">Spine</button>        
+                    <button type="button" class="btn btn-danger btn-block"><b>Lung (R)</b> <input type="radio" name="Right Lung" value=1> </button>       
                 </div>
             </div>
 
             <div class="row mb-3">
                 <div class="col-6">
-                    <button type="button" class="btn btn-primary btn-block">Torso</button>
+                    <button type="button" class="btn btn-success btn-block"><b>Spine</b> <input type="radio" name="Spine" value=0></button>
                 </div>
             
                 <div class="col-6">
-                    <button type="button" class="btn btn-danger btn-block">Torso</button>        
+                    <button type="button" class="btn btn-danger btn-block"><b>Spine</b> <input type="radio" name="Spine"  value=1></button>        
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-6">
+                    <button type="button" class="btn btn-success btn-block"><b>Heart</b> <input type="radio" name="Heart" value=0></button>
+                </div>
+            
+                <div class="col-6">
+                    <button type="button" class="btn btn-danger btn-block"><b>Heart</b> <input type="radio" name="Heart" value=1></button>        
                 </div>
             </div>
 
             <div class="row mb-1">
-                <div class="col-6">
-                    <button type="button" class="btn btn-primary btn-block">Heart</button>
+                <div class="col-12">
+                    <button type="button" class="btn btn-primary btn-block" onclick="gather_preferences()"> <b>Submit Preferences</b></button>
                 </div>
-            
-                <div class="col-6">
-                    <button type="button" class="btn btn-danger btn-block">Heart</button>        
+            </div>
+
+            <div class="row mb-1">
+                <div class="col-12">
+                    <button type="button" class="btn btn-primary btn-block" onclick="submit_final_pref_set()"> <b>Done</b></button>
                 </div>
             </div>
 
          </div>
          <div class='col-10'>
              
-             <div class="row mb-3">
+             <div class="row mb-2">
 
                  <div class="col-3">
-                     <img id="source" class="rounded mx-auto d-block" alt="..." width="150" height="150" style="width:150px height=150px">
+                     <img id="sample_1" class="rounded mx-auto d-block" alt="..." width="190" height="190" style="width:190px height=190px">
                  </div>
 
                  <div class="col-3">
-                     <img id="source" class="rounded mx-auto d-block" alt="..." width="150" height="150" style="width:150px height=150px">
+                     <img id="sample_2" class="rounded mx-auto d-block" alt="..." width="190" height="190" style="width:190px height=190px">
                  </div>
 
                  <div class="col-3">
-                     <img id="source" class="rounded mx-auto d-block" alt="..." width="150" height="150" style="width:150px height=150px">
+                      <img id="sample_3" class="rounded mx-auto d-block" alt="..." width="190" height="190" style="width:190px height=190px">
                  </div>
 
                  <div class="col-3">
-                     <img id="source" class="rounded mx-auto d-block" alt="..." width="150" height="150" style="width:150px height=150px">
+                     <img id="sample_4" class="rounded mx-auto d-block" alt="..." width="190" height="190" style="width:190px height=190px">
                  </div>
 
              </div>
 
-             <div class="row mb-1">
+             <div class="row mb-2">
 
                  <div class="col-3">
-                     <img id="source" class="rounded mx-auto d-block" alt="..." width="150" height="150" style="width:150px height=150px">
+                     <img id="sample_5" class="rounded mx-auto d-block" alt="..." width="190" height="190" style="width:190px height=190px">
                  </div>
 
                  <div class="col-3">
-                     <img id="source" class="rounded mx-auto d-block" alt="..." width="150" height="150" style="width:150px height=150px">
+                     <img id="sample_6" class="rounded mx-auto d-block" alt="..." width="190" height="190" style="width:190px height=190px">
                  </div>
 
                  <div class="col-3">
-                     <img id="source" class="rounded mx-auto d-block" alt="..." width="150" height="150" style="width:150px height=150px">
+                     <img id="sample_7" class="rounded mx-auto d-block" alt="..." width="190" height="190" style="width:190px height=190px">
                  </div>
 
                  <div class="col-3">
-                     <img id="source" class="rounded mx-auto d-block" alt="..." width="150" height="150" style="width:150px height=150px">
+                     <img id="sample_8" class="rounded mx-auto d-block" alt="..." width="190" height="190" style="width:190px height=190px">
                  </div>
 
              </div>

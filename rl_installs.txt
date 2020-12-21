@@ -1,3 +1,4 @@
 cloudpickle
 easy_tf_log
 gym
+shapely

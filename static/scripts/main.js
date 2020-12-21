@@ -68,9 +68,10 @@ function remove_highlight(img_tag_id)
 
 function remove_all_highlights()
 {
-    for (var i=0; i<sample_mapping.length; i++)
+    sample_ids = Object.keys(sample_mapping);
+    for (var i=0; i<sample_ids.length; i++)
     {
-        remove_highlight(sample_mapping[i]);
+        remove_highlight(sample_ids[i]);
     }
 }
 // #############################################################################

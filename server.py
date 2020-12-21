@@ -90,6 +90,17 @@ def interpolate():
 	return {'interpolated': url_for('static', \
 									filename="images/interpolated.png")}
 
+################### Code for submitting preferences ############################
+
+@app.route('/submit_prefs', methods=['POST'])
+
+def submit_prefs():
+	pref_dict = request.form['preferences']
+	preferences = json.loads(pref_dict)
+	print("Preferences",preferences)
+	get_prefs_from_frontend(preferences, pref_pipe)
+	return {"Done": "Done"}
+
 ############################## Backend Code #################################### 
 
 def initialize_comms():

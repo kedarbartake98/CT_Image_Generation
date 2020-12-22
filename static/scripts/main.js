@@ -79,6 +79,7 @@ function remove_all_highlights()
 window.onload = function()
 {
     reset_dashboard();
+    get_segments_from_backend();
 }
 
 function reset_dashboard()
@@ -91,58 +92,6 @@ function reset_dashboard()
     remove_all_highlights();
     highlight_sample('sample_1', colors['blue']);
 }
-
-// function check_curr_pref()
-// {
-//  pref_length = Object.keys(curr_pref).length;
-
-//  if (pref_length < 6 || !(curr_sample in pref_dict)) 
-//  {
-//      // console.log("false triggered");
-//      return false;
-//  }
-
-//  else if (pref_length == 6)
-//  {
-//      if (curr_sample in pref_dict)
-//      {
-//          var set_pref = prompt("Do you want to submit this as a new preference\
-//          for the highlighted frame", "Yes");
-
-//          if (set_pref!=null)
-//          {
-//              submit_pref();
-//          }
-
-//          else
-//          {
-//              //pass
-//          }
-//      }
-
-//      else
-//      {
-//          var set_pref = prompt("Do you want to submit this as a preference\
-//          for the highlighted frame", "Yes");
-//          if (set_pref!=null)
-//          {
-//              submit_pref();
-//          }
-
-//          else
-//          {
-//              //pass
-//          }
-//      }
-        
-//  }
-
-//  else
-//  {
-//      highlight_sample(sample_mapping[curr_sample], colors['green']);
-//      return true;
-//  }
-// }
 
 function select_prev_sample()
 {
@@ -374,6 +323,19 @@ function interpolate(slider_val)
         data: {inc: slider_val/100},
         success: function(data){
             render_interp(data['interpolated']);
+        }
+    })
+}
+
+function get_segments_from_backend()
+{
+    $.ajax({
+
+        type:"POST",
+        url: "/get_segments",
+        dataType:'json',
+        success: function(data){
+            console.log("Hello");
         }
     })
 }

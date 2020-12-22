@@ -14,7 +14,8 @@ from reinforcement_learning.utils import vector_to_image
 
 import easy_tf_log
 import numpy as np
-
+import string, os
+import scipy
 # from utils import VideoRenderer
 
 
@@ -41,7 +42,7 @@ class PrefInterface:
         if self.renderer:
             self.renderer.stop()
 
-    def run(self, seg_pipe, pref_pipe):
+    def run(self, seg_pipe, pref_pipe, path_pipe):
         while len(self.segments) < 8: #2: receive 8 segements at a time
             print("Preference interface waiting for segments")
             print("Preference interface waiting for segments")
@@ -80,8 +81,36 @@ class PrefInterface:
             torso = seg.frames[24][101:]
             torso.extend(vector_img_middle[20:])
             eight_images.append(vector_to_image(torso))
-        
 
+        # Create a random folder
+        random_foldername = [np.random.choice(string.ascii_letters) 
+                           for _ in range(12)]
+
+        random_foldername = ''.join(random_foldername)
+        folder_location = os.path.join('rl_sample_images', random_foldername)
+        os.makedir(folder_location)
+
+        # Put the image files in that folder
+
+        # create a mapping from folders to filenames
+        images = [img1, img2, img_mid]
+        images += eight_images
+
+        filenames = ['img1', 'img2', 'img_mid']
+        filenames += ['sample_{}'.format(i) for i in range(1,9)]
+
+        filepaths = [os.path.join(folder_location, filename)
+                     for filename in filenames]
+
+        mapping = [(images[i], filepaths[i]) for i in range(len(images))]
+        
+        _ = [scipy.misc.imsave(filepath, image) 
+             for (image, filepath) in mapping]
+
+        image_listing = dict(zip(filenames, filepaths))
+        image_listing['random_folder'] = random_foldername
+
+        path_pipe.put(image_listing, block=True)
 
         while True:
             seg_eight = None

@@ -41,7 +41,8 @@ def run(general_params,
         rew_pred_training_params,
         seg_pipe,
         pref_pipe,
-        start_policy_training_flag):
+        start_policy_training_flag,
+        path_pipe):
 
     ## TODO Arjun - initialize reward pred network -- DONE
     reward_predictor_network = net_cnn
@@ -74,6 +75,7 @@ def run(general_params,
         pi, pi_proc = start_pref_interface(   # gather preferences through interface
             seg_pipe=seg_pipe,
             pref_pipe=pref_pipe,
+            path_pipe=path_pipe,
             log_dir=general_params['log_dir'])#,
             # **pref_interface_params)
 
@@ -260,7 +262,7 @@ def start_policy_training(cluster_dict, make_reward_predictor, gen_segments,
     return env, proc
 
 
-def start_pref_interface(seg_pipe, pref_pipe,
+def start_pref_interface(seg_pipe, pref_pipe, path_pipe,
                          log_dir):
     def f():
         # The preference interface needs to get input from stdin. stdin is
@@ -269,7 +271,7 @@ def start_pref_interface(seg_pipe, pref_pipe,
         sys.stdin = os.fdopen(0)
         print('PREF')
         # print(PREF)
-        pi.run(seg_pipe=seg_pipe, pref_pipe=pref_pipe)
+        pi.run(seg_pipe=seg_pipe, pref_pipe=pref_pipe, path_pipe=path_pipe)
 
     # Needs to be done in the main process because does GUI setup work
     prefs_log_dir = osp.join(log_dir, 'pref_interface')

@@ -90,6 +90,17 @@ def interpolate():
 	return {'interpolated': url_for('static', \
 									filename="images/interpolated.png")}
 
+################### Code for sending segments to frontend ######################
+
+@app.route('/get_segments', methods=['POST'])
+
+def get_segments():
+	print("#"*100)
+	print("Testing path pipe")
+	print("#"*100)
+	print(type(path_pipe))
+
+
 ################### Code for submitting preferences ############################
 
 @app.route('/submit_prefs', methods=['POST'])
@@ -111,8 +122,9 @@ def initialize_comms():
 	seg_pipe = Queue(maxsize=8)
 	pref_pipe = Queue(maxsize=8)
 	start_policy_training_flag = Queue(maxsize=8)
+	path_pipe = Queue(maxsize=1)
 
-	return seg_pipe, pref_pipe, start_policy_training_flag
+	return seg_pipe, pref_pipe, start_policy_training_flag, path_pipe
 
 def start_backend(init_arg_tuple, comm_pipes):
 
@@ -123,7 +135,7 @@ def start_backend(init_arg_tuple, comm_pipes):
 	rew_pred_training_params, a2c_params = init_arg_tuple
 
 	# Unpack pipes
-	seg_pipe, pref_pipe, start_policy_training_flag = comm_pipes
+	seg_pipe, pref_pipe, start_policy_training_flag, path_pipe = comm_pipes
 
 	# Call main run function (3 modes from run.py)
 
@@ -131,7 +143,7 @@ def start_backend(init_arg_tuple, comm_pipes):
 	print(a2c_params)
 
 	run(general_params, a2c_params, pref_interface_params, 
-		rew_pred_training_params, seg_pipe, pref_pipe, 
+		rew_pred_training_params, seg_pipe, pref_pipe, path_pipe, 
 		start_policy_training_flag)
 
 ################################################################################
@@ -147,14 +159,14 @@ if __name__=='__main__':
 	clear_files()
 
 	# Initialize communication pipes
-	seg_pipe, pref_pipe, start_policy_training_flag = initialize_comms()
-	comm_pipes = (seg_pipe, pref_pipe, start_policy_training_flag)
+	seg_pipe, pref_pipe, start_policy_training_flag, path_pipe = initialize_comms()
+	comm_pipes = (seg_pipe, pref_pipe, start_policy_training_flag, path_pipe)
 
 	# Calling the Reinforcement Learning Script
-	# print('Starting Backend ..')
-	# backend_process = Process(target=start_backend, args=(init_arg_tuple,
-	# 													  comm_pipes))
-	# backend_process.start()
+	print('Starting Backend ..')
+	backend_process = Process(target=start_backend, args=(init_arg_tuple,
+														  comm_pipes))
+	backend_process.start()
 
 	# Initializing Frontend
 	print('Rendering Web App ...')
@@ -163,4 +175,4 @@ if __name__=='__main__':
 
 
 	fr_end_process.join()
-	# backend_process.join()
+	backend_process.join()

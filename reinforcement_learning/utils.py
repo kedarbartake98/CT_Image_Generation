@@ -291,17 +291,18 @@ def vector_to_image(vector):
     except:
         return None
     
-    gray_values = [230, 100, 50, 150, 200, 0]  # TODO: change values for normalization
-    img = np.ones((512,512))*255
+    # gray_values = [230, 100, 50, 150, 200, 0]  # TODO: change values for normalization
+    img = np.zeros((512,512))*255
     for ind,organ in enumerate(new_points):  # Need to be made faster / may be graphs
         organ = np.array(organ).astype(int)
-        img[organ[0],organ[1]] = gray_values[ind]
-        img[organ[0]+1,organ[1]] = gray_values[ind]
-        img[organ[0],organ[1]+1] = gray_values[ind]
-        img[organ[0]+1,organ[1]+1] = gray_values[ind]
-        img[organ[0]-1,organ[1]] = gray_values[ind]
-        img[organ[0],organ[1]-1] = gray_values[ind]
-        img[organ[0]-1,organ[1]-1] = gray_values[ind]
+        img[organ[0],organ[1]] = 255 # gray_values[ind]
+        # img[organ[0],organ[1]] = gray_values[ind]
+        img[organ[0]+1,organ[1]] = 255 # gray_values[ind]
+        img[organ[0],organ[1]+1] = 255 # gray_values[ind]
+        img[organ[0]+1,organ[1]+1] = 255 # gray_values[ind]
+        img[organ[0]-1,organ[1]] = 255 # gray_values[ind]
+        img[organ[0],organ[1]-1] = 255 # gray_values[ind]
+        img[organ[0]-1,organ[1]-1] = 255 # gray_values[ind]
         
     return img
 

@@ -151,8 +151,8 @@ class Runner(object):  # Trains workers, does actions etc and pushed clips for p
 
     def update_segment_buffer(self, mb_states, mb_rewards, mb_dones):
 
-        print('#'*100)
-        print("Called UPDATE SEGMENT Buffer")
+        # print('#'*100)
+        # print("Called UPDATE SEGMENT Buffer")
         # Segments are only generated from the first worker.
         # Empirically, this seems to work fine.
         for e0_states, e0_rew, e0_dones in zip(mb_states, mb_rewards, mb_dones):
@@ -165,7 +165,11 @@ class Runner(object):  # Trains workers, does actions etc and pushed clips for p
             assert_equal(e0_dones.shape, (self.nsteps, ))
 
             for step in range(self.nsteps):
+                # print("Called UPDATE SEGMENT Buffer 2")
                 self.segment.append(np.copy(e0_states[step]), np.copy(e0_rew[step]))
+                # print('Segment OBS')
+                # # print(self.norm_obs_st)
+                # print(self.segment.frames)
                 if len(self.segment) == 25 or e0_dones[step]:
                     while len(self.segment) < 25:  # maybe 9 max?
                         # Pad to 25 steps long so that all segments in the batch
@@ -175,14 +179,18 @@ class Runner(object):  # Trains workers, does actions etc and pushed clips for p
                         self.segment.append(e0_states[step], 0)
                     self.segment.finalise()
                     try:
-                        self.seg_pipe.put(self.segment, block=False)  
+                        # print("Called UPDATE SEGMENT Buffer 3")
+                        self.seg_pipe.put(self.segment, block=False)
+                        # print("Called UPDATE SEGMENT Buffer 3.5")
+
                     except queue.Full:
+                        pass
+                        # print("Called UPDATE SEGMENT Buffer 4")
                         ### ??? we should wait for half a second or break from the 
                         ### entire eight segments
                         # If the preference interface has a backlog of segments
                         # to deal with, don't stop training the agents. Just drop
                         # the segment and keep on going.
-                        pass
                     self.segment = Segment()
 
 #     def update_episode_frame_buffer(self, mb_obs, mb_dones):
@@ -225,8 +233,8 @@ class Runner(object):  # Trains workers, does actions etc and pushed clips for p
         mb_dones.append(self.dones)
         # batch of steps to batch of rollouts
         # i.e. from nsteps, nenvs to nenvs, nsteps
-        mb_obs = np.asarray(mb_obs, dtype=np.uint8).swapaxes(1, 0)
-        mb_states = np.asarray(mb_states, dtype=np.uint8).swapaxes(1, 0)
+        mb_obs = np.asarray(mb_obs, dtype=np.float32).swapaxes(1, 0)
+        mb_states = np.asarray(mb_states, dtype=np.float32).swapaxes(1, 0)
         mb_rewards = np.asarray(mb_rewards, dtype=np.float32).swapaxes(1, 0)
         mb_actions = np.asarray(mb_actions, dtype=np.int32).swapaxes(1, 0)
         mb_values = np.asarray(mb_values, dtype=np.float32).swapaxes(1, 0)

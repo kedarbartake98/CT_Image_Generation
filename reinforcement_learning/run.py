@@ -41,8 +41,8 @@ def run(general_params,
         rew_pred_training_params,
         seg_pipe,
         pref_pipe,
-        start_policy_training_flag,
-        path_pipe):
+        path_pipe,
+        start_policy_training_flag):
 
     ## TODO Arjun - initialize reward pred network -- DONE
     reward_predictor_network = net_cnn

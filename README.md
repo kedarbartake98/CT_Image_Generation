@@ -9,3 +9,6 @@ Description of files:
 - server.py       :   Flask server for the visualization web app
 - static/main.js  :   Javascript file for interactions in the web page
 - templates/index.html:   Main web page HTML
+
+
+![](images/Dashboard.png?raw=true)

@@ -65,9 +65,9 @@ class PrefInterface:
         vector_img_2 = self.segments[0].frames[24][50:100]
         vector_img_middle = [] 
         int_lvl = self.segments[0].frames[24][100]
-        if int_level == 0:
+        if int_lvl == 0:
             vector_img_middle = 0.7*vector_img_1 + 0.3*vector_img_2  # for slider at 0.3
-        elif int_level == 1:
+        elif int_lvl == 1:
             vector_img_middle = 0.5*vector_img_1 + 0.5*vector_img_2
         else:
             vector_img_middle = 0.3*vector_img_1 + 0.7*vector_img_2
@@ -109,6 +109,8 @@ class PrefInterface:
 
         image_listing = dict(zip(filenames, filepaths))
         image_listing['random_folder'] = random_foldername
+        level_mapping = {0:0.3, 1:0.5, 2:0.7}
+        image_listing['level'] = level_mapping[int_lvl]*100
 
         path_pipe.put(image_listing, block=True)
 

@@ -6,6 +6,9 @@
 *.zip
 *.DS_Store
 *.mat
+*.pkl
+*.png
+logs/*
 data/pgnn/pgnn/main.py
 data/pgnn/pgnn/man.py
 data/pgnn/pgnn/models/Untitled document.docx

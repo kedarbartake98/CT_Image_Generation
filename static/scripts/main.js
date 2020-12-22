@@ -91,6 +91,7 @@ function reset_dashboard()
     reset_slider();
     remove_all_highlights();
     highlight_sample('sample_1', colors['blue']);
+    get_segments_from_backend();
 }
 
 function select_prev_sample()

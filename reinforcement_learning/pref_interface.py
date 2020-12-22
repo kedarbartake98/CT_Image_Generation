@@ -88,7 +88,8 @@ class PrefInterface:
                              for k in range(0,12)]
 
         random_foldername = ''.join(random_foldername)
-        folder_location = os.path.join('rl_sample_images', random_foldername)
+        folder_location = os.path.join('static/rl_sample_images', 
+                                        random_foldername)
         os.makedirs(folder_location)
 
         # Put the image files in that folder
@@ -106,19 +107,18 @@ class PrefInterface:
                      for filename in filenames]
 
         mapping = [(images[i], filepaths[i]) for i in range(11)]
-        
-        _ = [imageio.imwrite(filepath, image) 
-             for (image, filepath) in mapping]
 
-        print('&'*100)
-        print("DONE saving Images")
+        filepaths = [filepath.split('static/')[1] for filepath in filepaths]
 
         image_listing = dict(zip(filenames, filepaths))
         image_listing['random_folder'] = random_foldername
         level_mapping = {0:0.3, 1:0.5, 2:0.7}
         image_listing['level'] = level_mapping[int_lvl]*100
-
+        
         path_pipe.put(image_listing, block=True)
+
+        _ = [imageio.imwrite(filepath, image) 
+             for (image, filepath) in mapping]
 
         while True:
             seg_eight = None

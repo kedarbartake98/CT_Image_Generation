@@ -98,10 +98,22 @@ def get_segments():
     print("#"*100)
     print("Testing path pipe")
     print("#"*100)
-    # print(type(path_pipe))
 
-    # segment_dict
+    path_dict = path_pipe.get(block=True)
+    folder = os.path.join('static/rl_sample_images', path_dict['random_folder'])
 
+    while len(os.listdir(folder))<11:
+        pass
+
+    filenames = ['img1', 'img2', 'img_mid']
+    filenames += ['sample_{}'.format(i) for i in range(1,9)]
+
+    for filename in filenames:
+
+        path_dict[filename] = url_for('static',\
+                                       filename=path_dict[filename])
+
+    return jsonify(path_dict)
 
 ################### Code for submitting preferences ############################
 

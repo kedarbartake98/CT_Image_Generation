@@ -336,6 +336,39 @@ function get_segments_from_backend()
         dataType:'json',
         success: function(data){
             console.log("Hello");
+            render_images(data);
         }
     })
+}
+
+function render_images(path_dict)
+{
+    console.log("Render Images");
+    console.log(path_dict);
+    document.getElementById("source").src = path_dict['img1'] + "?" + new Date().getTime();
+    document.getElementById("dest").src = path_dict['img2'] + "?" + new Date().getTime();
+    document.getElementById("interpolated").src = path_dict['img_mid'] + "?" + new Date().getTime();
+
+    sample_names = Object.keys(sample_mapping);
+    // console.log(sample_names); 
+    document.getElementById('sample_1').src = path_dict['sample_1']+ "?" + new Date().getTime();
+    document.getElementById('sample_2').src = path_dict['sample_2']+ "?" + new Date().getTime();
+    document.getElementById('sample_3').src = path_dict['sample_3']+ "?" + new Date().getTime();
+    document.getElementById('sample_4').src = path_dict['sample_4']+ "?" + new Date().getTime();
+    document.getElementById('sample_5').src = path_dict['sample_5']+ "?" + new Date().getTime();
+    document.getElementById('sample_6').src = path_dict['sample_6']+ "?" + new Date().getTime();
+    document.getElementById('sample_7').src = path_dict['sample_7']+ "?" + new Date().getTime();
+    document.getElementById('sample_8').src = path_dict['sample_8']+ "?" + new Date().getTime();
+    // document.getElementById('sample_1').src = path_dict['sample_1']+ "?" + new Date().getTime();
+
+    // for (var i; i<sample_names.length; i++)
+    // {
+    //     console.log('Rendering Sample');
+    //     var sampleid = sample_names[i];
+    //     console.log(sampleid);
+    //     document.getElementById(sampleid).src = path_dict[sampleid]+ "?" + new Date().getTime();
+    // }
+
+    set_slider_value(parseInt(path_dict['level']));
+
 }

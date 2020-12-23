@@ -206,6 +206,7 @@ class Runner(object):  # Trains workers, does actions etc and pushed clips for p
 #                 self.episode_frames = []
 
     def run(self):
+        np.warnings.filterwarnings('ignore', category=np.VisibleDeprecationWarning)
         nenvs = self.env.nenvs
         mb_obs, mb_states, mb_rewards, mb_actions, mb_values, mb_dones = \
             [], [], [], [], [], []

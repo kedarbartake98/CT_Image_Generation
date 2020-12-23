@@ -53,6 +53,7 @@ class CustomEnv(gym.Env):
                                                           dtype=np.float16)
 
     def step(self, action):
+        np.warnings.filterwarnings('ignore', category=np.VisibleDeprecationWarning)
         # Execute one time step within the environment
         assert_equal(action.shape, (self.nenvs,))
         self._take_action(action)

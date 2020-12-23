@@ -44,6 +44,7 @@ class PrefInterface:
             self.renderer.stop()
 
     def run(self, seg_pipe, pref_pipe, path_pipe):
+        np.warnings.filterwarnings('ignore', category=np.VisibleDeprecationWarning)
         while len(self.segments) < 8: #2: receive 8 segements at a time
             print("Preference interface waiting for segments")
             print("Preference interface waiting for segments")

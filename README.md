@@ -17,7 +17,7 @@
 
 ### Dashboard for user input to train Deep RL model  
   
-  ![Screenshot](images/Dashboard.png?raw=true)
+  ![Screenshot](Dashboard.png?raw=true)
  
 ### Description of files:
 

@@ -51,6 +51,14 @@
             cursor: pointer;
         }
 
+        .sample-neighborhood-container {
+            background-color: #333333;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding-bottom: 20px;
+        }
+
         .render-samples-container{
             display: flex;
             flex-direction: row;
@@ -58,7 +66,6 @@
             width: 100%;
             justify-content: center;
             padding: auto;
-            background-color: #333333;
         }
 
         .sample-image-container {
@@ -69,7 +76,7 @@
         }
         .organ-description {
             padding: 10px;
-            width: 120px;
+            width: 150px;
             text-align: center;
             color: white;
             background-color: #595756;
@@ -80,7 +87,7 @@
 
         .organ-description-green {
             padding: 10px;
-            width: 120px;
+            width: 150px;
             text-align: center;
             color: white;
             background-color: rgb(83, 121, 26);
@@ -91,7 +98,7 @@
 
         .organ-description-red {
             padding: 10px;
-            width: 120px;
+            width: 150px;
             text-align: center;
             color: white;
             background-color:rgb(223, 94, 94);
@@ -113,11 +120,20 @@
         }
         
         .sample-image {
-            height: 250px;
+            height: 275px;
             width: 300px;
             margin-right: 10px;
         }
 
+        .submit-preferences-button {
+            padding: 15px;
+            color: #fff;
+            background-color: #337ab7;
+            border-color: #2e6da4;
+            font-weight: 600;
+            font-size: large;
+            align-self: center;
+        }
     </style>
   </head>
   <title>CT Image generation using Reinforcement Learning</title>
@@ -391,6 +407,7 @@
             }
             this.handleLeftClick = this.handleLeftClick.bind(this);
             this.handleRightClick = this.handleRightClick.bind(this);
+            this.submitPreferences = this.submitPreferences.bind(this);
         }
         componentDidMount() {
             fetch("/get_segments",{
@@ -439,9 +456,8 @@
         }
 
         handleLeftClick(e,id, organ) {
-            console.log(`Left Clicked Sample ${id}: ${organ}`)
+            // console.log(`Left Clicked Sample ${id+1}: ${organ}`)
             let temp_preferences = this.state.preferences;
-            // let sampleID = id.toString();
             temp_preferences[id][organ] = '1';
             this.setState({
                 preferences: temp_preferences
@@ -451,13 +467,16 @@
 
         handleRightClick(e, id, organ) {
             e.preventDefault()
-            console.log(`Right Clicked Sample ${id}: ${organ}`)
+            // console.log(`Right Clicked Sample ${id+1}: ${organ}`)
             let temp_preferences = this.state.preferences;
-            // let sampleID = id.toString();
             temp_preferences[id][organ] = '0';
             this.setState({
                 preferences: temp_preferences
             })
+        }
+
+        submitPreferences() {
+            console.log(this.state.preferences)
         }
 
         render() { 
@@ -471,84 +490,88 @@
                                 <div className="sample-image-container">
                                     <img src={""} className="sample-image"/>
 
-                            <div>
-                                <div 
-                                    className={ this.state.preferences[index]["Torso"] === null
-                                                    ? "organ-description"
-                                                    :  this.state.preferences[index]["Torso"] === "1" 
-                                                    ? "organ-description-green"
-                                                    : "organ-description-red" } 
-                                    onClick={(e=event,sample_id = index,organ="Torso") => this.handleLeftClick(e,sample_id,organ)} 
-                                    onContextMenu={(e=event,sample_id = index,organ="Torso") => this.handleRightClick(e, sample_id, organ)}
-                                >
-                                    Torso
+                                    <div>
+                                        <div 
+                                            className={ this.state.preferences[index]["Torso"] === null
+                                                            ? "organ-description"
+                                                            :  this.state.preferences[index]["Torso"] === "1" 
+                                                            ? "organ-description-green"
+                                                            : "organ-description-red" } 
+                                            onClick={(e=event,sample_id = index,organ="Torso") => this.handleLeftClick(e,sample_id,organ)} 
+                                            onContextMenu={(e=event,sample_id = index,organ="Torso") => this.handleRightClick(e, sample_id, organ)}
+                                        >
+                                            Torso
+                                        </div>
+                                        <div 
+                                            className={ this.state.preferences[index]["Left Lung"] === null
+                                                            ? "organ-description"
+                                                            :  this.state.preferences[index]["Left Lung"] === "1" 
+                                                            ? "organ-description-green"
+                                                            : "organ-description-red" }
+                                            onClick={(e=event,sample_id = index,organ="Left Lung") => this.handleLeftClick(e,sample_id,organ)} 
+                                            onContextMenu={(e=event,sample_id = index,organ="Left Lung")=> this.handleRightClick(e, sample_id, organ)}
+                                        > 
+                                            Lung (L)
+                                        </div>
+                                        <div 
+                                        className={ this.state.preferences[index]["Right Lung"] === null
+                                                            ? "organ-description"
+                                                            :  this.state.preferences[index]["Right Lung"] === "1" 
+                                                            ? "organ-description-green"
+                                                            : "organ-description-red" }
+                                        onClick={(e=event,sample_id = index,organ="Right Lung")=> this.handleLeftClick(e,sample_id,organ)}
+                                        onContextMenu={(e=event,sample_id = index,organ="Right Lung")=> this.handleRightClick(e, sample_id, organ)}
+                                        >
+                                            Lung (R)
+                                        </div>
+                                        <div 
+                                        className={ this.state.preferences[index]["Spine"] === null
+                                                            ? "organ-description"
+                                                            :  this.state.preferences[index]["Spine"] === "1" 
+                                                            ? "organ-description-green"
+                                                            : "organ-description-red" }
+                                        onClick={(e=event,sample_id = index,organ="Spine") => this.handleLeftClick(e,sample_id,organ)} 
+                                        onContextMenu={(e=event,sample_id = index,organ="Spine")=> this.handleRightClick(e, sample_id, organ)} 
+                                        >
+                                            Spine
+                                        </div>
+                                        <div 
+                                        className={ this.state.preferences[index]["Heart"] === null
+                                                            ? "organ-description"
+                                                            :  this.state.preferences[index]["Heart"] === "1" 
+                                                            ? "organ-description-green"
+                                                            : "organ-description-red" }
+                                        onClick={(e=event,sample_id = index,organ="Heart") => this.handleLeftClick(e,sample_id,organ)} 
+                                        onContextMenu={(e=event,sample_id = index,organ="Heart")=> this.handleRightClick(e, sample_id, organ)} 
+                                        >
+                                            Heart
+                                        </div>
+                                        <div 
+                                        className={ this.state.preferences[index]["Accept/Reject"] === null
+                                                            ? "organ-description"
+                                                            :  this.state.preferences[index]["Accept/Reject"] === "1" 
+                                                            ? "organ-description-green"
+                                                            : "organ-description-red" }
+                                        onClick={(e=event,sample_id = index,organ="Accept/Reject") => this.handleLeftClick(e,sample_id,organ)} 
+                                        onContextMenu={(e=event,sample_id = index,organ="Accept/Reject")=> this.handleRightClick(e, sample_id, organ)} 
+                                        >
+                                            Accept / Reject
+                                        </div>
+                                    </div>
                                 </div>
-                                <div 
-                                    className={ this.state.preferences[index]["Left Lung"] === null
-                                                    ? "organ-description"
-                                                    :  this.state.preferences[index]["Left Lung"] === "1" 
-                                                    ? "organ-description-green"
-                                                    : "organ-description-red" }
-                                    onClick={(e=event,sample_id = index,organ="Left Lung") => this.handleLeftClick(e,sample_id,organ)} 
-                                    onContextMenu={(e=event,sample_id = index,organ="Left Lung")=> this.handleRightClick(e, sample_id, organ)}
-                                > 
-                                    Lung (L)
-                                </div>
-                                <div 
-                                className={ this.state.preferences[index]["Right Lung"] === null
-                                                    ? "organ-description"
-                                                    :  this.state.preferences[index]["Right Lung"] === "1" 
-                                                    ? "organ-description-green"
-                                                    : "organ-description-red" }
-                                onClick={(e=event,sample_id = index,organ="Right Lung")=> this.handleLeftClick(e,sample_id,organ)}
-                                onContextMenu={(e=event,sample_id = index,organ="Right Lung")=> this.handleRightClick(e, sample_id, organ)}
-                                >
-                                    Lung (R)
-                                </div>
-                                <div 
-                                className={ this.state.preferences[index]["Spine"] === null
-                                                    ? "organ-description"
-                                                    :  this.state.preferences[index]["Spine"] === "1" 
-                                                    ? "organ-description-green"
-                                                    : "organ-description-red" }
-                                onClick={(e=event,sample_id = index,organ="Spine") => this.handleLeftClick(e,sample_id,organ)} 
-                                onContextMenu={(e=event,sample_id = index,organ="Spine")=> this.handleRightClick(e, sample_id, organ)} 
-                                >
-                                    Spine
-                                </div>
-                                <div 
-                                className={ this.state.preferences[index]["Heart"] === null
-                                                    ? "organ-description"
-                                                    :  this.state.preferences[index]["Heart"] === "1" 
-                                                    ? "organ-description-green"
-                                                    : "organ-description-red" }
-                                onClick={(e=event,sample_id = index,organ="Heart") => this.handleLeftClick(e,sample_id,organ)} 
-                                onContextMenu={(e=event,sample_id = index,organ="Heart")=> this.handleRightClick(e, sample_id, organ)} 
-                                >
-                                    Heart
-                                </div>
-                                <div 
-                                className={ this.state.preferences[index]["Accept/Reject"] === null
-                                                    ? "organ-description"
-                                                    :  this.state.preferences[index]["Accept/Reject"] === "1" 
-                                                    ? "organ-description-green"
-                                                    : "organ-description-red" }
-                                onClick={(e=event,sample_id = index,organ="Accept/Reject") => this.handleLeftClick(e,sample_id,organ)} 
-                                onContextMenu={(e=event,sample_id = index,organ="Accept/Reject")=> this.handleRightClick(e, sample_id, organ)} 
-                                >
-                                    Accept or Reject
-                                </div>
-                            </div>
-                        </div>: ""
+                                : ""
                             }
-                    </div>
+                        </div>
                     )
                 })
                 
             return (
-            <div className="render-samples-container">
-                {render_images}
-            </div>
+                <div className="sample-neighborhood-container">
+                    <div className="render-samples-container">
+                        {render_images}
+                    </div>
+                    <button className="submit-preferences-button" onClick = {()=> this.submitPreferences()}>Submit Preferences</button>
+                </div>
             );
         }    
     }

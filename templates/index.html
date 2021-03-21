@@ -125,6 +125,14 @@
             margin-right: 10px;
         }
 
+        .sample-image-border-green {
+            border: 7px solid green;
+        }
+
+        .sample-image-border-blue {
+            border: 7px solid #2e6da4
+        }
+
         .submit-preferences-button {
             padding: 15px;
             color: #fff;
@@ -476,7 +484,21 @@
         }
 
         submitPreferences() {
-            console.log(this.state.preferences)
+            // console.log(this.state.preferences)
+            let final_preferences = this.state.preferences;
+            let complete_Flag = true;
+            for(let i=0; i<final_preferences.length; i++) {
+                let pref = final_preferences[i];
+                for(let key in pref){
+                    if(pref[key] === null) {
+                        complete_Flag = false
+                        break;
+                    }
+                }
+                if(!complete_Flag) break;
+            }
+            if(complete_Flag) alert("Preferences are Submitted")
+            else alert("Please submit the preferences for all the samples")
         }
 
         render() { 
@@ -488,7 +510,14 @@
                             {
                                 this.state.preferences.length ?
                                 <div className="sample-image-container">
-                                    <img src={""} className="sample-image"/>
+                                    <img 
+                                        src={""} 
+                                        className={ this.state.preferences[index]["Accept/Reject"] === null
+                                                            ? "sample-image"
+                                                            :  this.state.preferences[index]["Accept/Reject"] === "1" 
+                                                            ? "sample-image sample-image-border-green"
+                                                            : "sample-image sample-image-border-blue" }
+                                    />
 
                                     <div>
                                         <div 

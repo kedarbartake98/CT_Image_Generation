@@ -111,7 +111,6 @@ def get_segments():
     filenames += ['sample_{}'.format(i) for i in range(1,9)]
 
     for filename in filenames:
-
         path_dict[filename] = url_for('static',\
                                        filename=path_dict[filename])
     print(path_dict)

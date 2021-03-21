@@ -14,46 +14,80 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://d3js.org/d3.v4.js" charset="utf-8"></script>
-
-
+    <!-- <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}"> -->
     <style>
-    .slidecontainer {
-    width: 100%;
-    }
+        .slidecontainer {
+            width: 100%;
+        }
 
-    .slider {
-    -webkit-appearance: none;
-    width: 100%;
-    height: 25px;
-    background: #d3d3d3;
-    outline: none;
-    opacity: 0.7;
-    -webkit-transition: .2s;
-    transition: opacity .2s;
-    }
+        .slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 25px;
+            background: #d3d3d3;
+            outline: none;
+            opacity: 0.7;
+            -webkit-transition: .2s;
+            transition: opacity .2s;
+        }
 
-    .slider:hover {
-    opacity: 1;
-    }
+        .slider:hover {
+            opacity: 1;
+        }
 
-    .slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 25px;
-    height: 25px;
-    background: #337AB7;
-    cursor: pointer;
-    }
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 25px;
+            height: 25px;
+            background: #337AB7;
+            cursor: pointer;
+        }
 
-    .slider::-moz-range-thumb {
-    width: 25px;
-    height: 25px;
-    background: #337AB7;
-    cursor: pointer;
-    }
-      
+        .slider::-moz-range-thumb {
+            width: 25px;
+            height: 25px;
+            background: #337AB7;
+            cursor: pointer;
+        }
+
+        .render-samples-container{
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            width: 100%;
+            justify-content: center;
+            padding: auto;
+            background-color: #333333;
+        }
+
+        .sample-image-container {
+            display: flex;
+            flex-direction: row;
+            margin: 10px;
+        }
+        .organ-description {
+            padding: 10px;
+            width: 120px;
+            text-align: center;
+            color: white;
+            background-color: #595756;
+            margin-bottom: 5px;
+            font-weight: 600;
+            font-size: medium;
+        }
+
+        .organ-description:hover {
+            cursor: pointer;
+        }
+
+        .sample-image {
+            height: 250px;
+            width: 300px;
+            margin-right: 10px;
+        }
+
     </style>
-
   </head>
   <title>CT Image generation using Reinforcement Learning</title>
 <!-- Adding React -->
@@ -323,6 +357,8 @@
                 data: {},
                 sampleImages: []
             }
+            this.handleLeftClick = this.handleLeftClick.bind(this);
+            this.handleRightClick = this.handleRightClick.bind(this);
         }
         componentDidMount() {
             fetch("/get_segments",{
@@ -346,18 +382,36 @@
             })
         }
 
-        render() { 
+        handleLeftClick(e) {
+            console.log("Left Click")
+        }
 
-            const render_images = this.state.sampleImages.map((img_src,index) => {
+        handleRightClick(e) {
+            e.preventDefault()
+            console.log("Right Click")
+        }
+
+        render() { 
+            let temp_samples = [1,2,3,4,5,6,7,8]
+            const render_images = temp_samples.map((img_src,index) => {
                     return (
-                        <div key={index}>
-                            <img src={img_src}/>
+                        <div key={index} className="sample-image-container">
+                            <div>
+                                <img src={""} className="sample-image"/>
+                            </div>
+                            <div>
+                                <div className="organ-description" onClick={(e)=> this.handleLeftClick(e)} onContextMenu={(e) => this.handleRightClick(e)}>Torso</div>
+                                <div className="organ-description">Lung (R)</div>
+                                <div className="organ-description">Lung (L)</div>
+                                <div className="organ-description">Spine</div>
+                                <div className="organ-description">Heart</div>
+                            </div>
                         </div>
                     )
                 })
                 
             return (
-            <div>
+            <div className="render-samples-container">
                 {render_images}
             </div>
             );

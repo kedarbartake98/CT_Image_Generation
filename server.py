@@ -92,7 +92,7 @@ def interpolate():
 
 ################### Code for sending segments to frontend ######################
 
-@app.route('/get_segments', methods=['POST'])
+@app.route('/get_segments', methods=['GET','POST'])
 
 def get_segments():
     print("#"*100)

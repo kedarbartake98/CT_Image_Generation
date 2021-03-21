@@ -342,10 +342,10 @@ function get_segments_from_backend()
     })
 }
 
-function render_images(path_dict)
+const  render_images = (path_dict) =>
 {
     console.log("Render Images");
-    console.log(path_dict);
+    // console.log(path_dict);
     document.getElementById("source").src = path_dict['img1'] + "?" + new Date().getTime();
     document.getElementById("dest").src = path_dict['img2'] + "?" + new Date().getTime();
     document.getElementById("interpolated").src = path_dict['img_mid'] + "?" + new Date().getTime();

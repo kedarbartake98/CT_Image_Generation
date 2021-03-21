@@ -328,19 +328,19 @@ function interpolate(slider_val)
     })
 }
 
-function get_segments_from_backend()
-{
-    $.ajax({
+// function get_segments_from_backend()
+// {
+//     $.ajax({
 
-        type:"POST",
-        url: "/get_segments",
-        dataType:'json',
-        success: function(data){
-            console.log("Hello");
-            render_images(data);
-        }
-    })
-}
+//         type:"POST",
+//         url: "/get_segments",
+//         dataType:'json',
+//         success: function(data){
+//             console.log("Hello");
+//             render_images(data);
+//         }
+//     })
+// }
 
 const  render_images = (path_dict) =>
 {

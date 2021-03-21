@@ -320,7 +320,8 @@
         constructor(props){
             super(props);
             this.state = {
-                data: {}
+                data: {},
+                sampleImages: []
             }
         }
         componentDidMount() {
@@ -332,17 +333,32 @@
             })
             .then(response => response.json())
             .then(data => {
-                console.log("In Fetch");
+                let images = [];
+                let defaultName = "sample_"
+                for(let i=1;i<9;i++) {
+                    let obj_key = defaultName + i;
+                    images.push(data[obj_key])
+                }
                 this.setState({
-                    data: data
+                    data: {...data},
+                    sampleImages: [...images]
                 })
             })
         }
 
         render() { 
+
+            const render_images = this.state.sampleImages.map((img_src,index) => {
+                    return (
+                        <div key={index}>
+                            <img src={img_src}/>
+                        </div>
+                    )
+                })
+                
             return (
             <div>
-                {this.props.msg}
+                {render_images}
             </div>
             );
         }    
@@ -352,7 +368,7 @@
     function App(){
         return(
             <div>
-                <Main msg="Testing"/>
+                <Main/>
             </div>
         )
     }

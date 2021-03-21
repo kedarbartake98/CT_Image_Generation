@@ -328,6 +328,10 @@ function interpolate(slider_val)
     })
 }
 
+function test() {
+    console.log("TEst Function Called");
+}
+
 // function get_segments_from_backend()
 // {
 //     $.ajax({

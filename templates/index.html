@@ -383,29 +383,30 @@
             })
         }
 
-        handleLeftClick(e) {
-            console.log("Left Click")
+        handleLeftClick(e,id, organ) {
+            console.log(`Left Clicked Sample ${id}: ${organ}`)
+
         }
 
-        handleRightClick(e) {
+        handleRightClick(e, id, organ) {
             e.preventDefault()
-            console.log("Right Click")
+            console.log(`Right Clicked Sample ${id}: ${organ}`)
         }
 
         render() { 
             let temp_samples = [1,2,3,4,5,6,7,8]
             const render_images = temp_samples.map((img_src,index) => {
                     return (
-                        <div key={index} className="sample-image-container">
+                        <div key={index+1} className="sample-image-container">
                             <div>
                                 <img src={""} className="sample-image"/>
                             </div>
                             <div>
-                                <div className="organ-description" onClick={(e)=> this.handleLeftClick(e)} onContextMenu={(e) => this.handleRightClick(e)}>Torso</div>
-                                <div className="organ-description">Lung (R)</div>
-                                <div className="organ-description">Lung (L)</div>
-                                <div className="organ-description">Spine</div>
-                                <div className="organ-description">Heart</div>
+                                <div className="organ-description" onClick={(e=event,sample_id = index+1,organ="Torso")=> this.handleLeftClick(e,sample_id,organ)} onContextMenu={(e=event,sample_id = index+1,organ="Torso") => this.handleRightClick(e, sample_id, organ)}>Torso</div>
+                                <div className="organ-description" onClick={(e=event,sample_id = index+1,organ="Left Lung")=> this.handleLeftClick(e,sample_id,organ)} onContextMenu={(e=event,sample_id = index+1,organ="Left Lung")=> this.handleRightClick(e, sample_id, organ)}> Lung (L)</div>
+                                <div className="organ-description" onClick={(e=event,sample_id = index+1,organ="Right Lung")=> this.handleLeftClick(e,sample_id,organ)} onContextMenu={(e=event,sample_id = index+1,organ="Right Lung")=> this.handleRightClick(e, sample_id, organ)}>Lung (R)</div>
+                                <div className="organ-description" onClick={(e=event,sample_id = index+1,organ="Spine")=> this.handleLeftClick(e,sample_id,organ)} onContextMenu={(e=event,sample_id = index+1,organ="Spine")=> this.handleRightClick(e, sample_id, organ)} >Spine</div>
+                                <div className="organ-description" onClick={(e=event,sample_id = index+1,organ="Heart")=> this.handleLeftClick(e,sample_id,organ)} onContextMenu={(e=event,sample_id = index+1,organ="Heart")=> this.handleRightClick(e, sample_id, organ)} >Heart</div>
                             </div>
                         </div>
                     )

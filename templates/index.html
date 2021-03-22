@@ -439,11 +439,10 @@
                     sampleImages: [...images],
                 })
             })
-
+            // TODO: Update it to original sample received
             let temp_samples = [1,2,3,4,5,6,7,8]
                 let temp_preferences = []
                 let temp_organ_preference = {
-                    "sampleID": null,
                     "Accept/Reject": null,
                     "Torso": null,
                     "Left Lung": null,
@@ -453,18 +452,14 @@
                 }
                 for(let i=1; i<=temp_samples.length; i++)  {
                     let id = i.toString();
-                    temp_organ_preference["sampleID"] = id;
                     temp_preferences.push({...temp_organ_preference})
                 }
-                // console.log(temp_preferences)
                 this.setState({
                     preferences: [...temp_preferences]
                 })
-                // console.log(this.state)
         }
 
         handleLeftClick(e,id, organ) {
-            // console.log(`Left Clicked Sample ${id+1}: ${organ}`)
             let temp_preferences = this.state.preferences;
             temp_preferences[id][organ] = '1';
             this.setState({
@@ -475,7 +470,6 @@
 
         handleRightClick(e, id, organ) {
             e.preventDefault()
-            // console.log(`Right Clicked Sample ${id+1}: ${organ}`)
             let temp_preferences = this.state.preferences;
             temp_preferences[id][organ] = '0';
             this.setState({
@@ -484,7 +478,6 @@
         }
 
         submitPreferences() {
-            // console.log(this.state.preferences)
             let final_preferences = this.state.preferences;
             let complete_Flag = true;
             for(let i=0; i<final_preferences.length; i++) {
@@ -497,14 +490,29 @@
                 }
                 if(!complete_Flag) break;
             }
-            if(complete_Flag) alert("Preferences are Submitted")
+            if(complete_Flag){
+                let pref_req = {}
+                for(let i=0;i<final_preferences.length;i++){
+                    pref_req[i+1] = {...final_preferences[i]}
+                }
+                // TODO: Reset Dashboard
+                $.ajax({
+                    type:"POST",
+                    url: "/submit_prefs",
+                    dataType:'json',
+                    data: {preferences: JSON.stringify(pref_req)},
+                    success: function(data){
+                       alert("All the preferences have been submitted")
+                    }
+                })
+            }
             else alert("Please submit the preferences for all the samples")
         }
 
         render() { 
             let temp_samples = [1,2,3,4,5,6,7,8]
             const render_images = temp_samples.map((img_src,index) => {
-               // let sampleID = index
+                    // Update it to original images received
                     return (
                         <div key={index+1} >
                             {

@@ -80,31 +80,26 @@
             text-align: center;
             color: white;
             background-color: #595756;
+            opacity: 0.8;
             margin-bottom: 5px;
             font-weight: 600;
             font-size: medium;
+            border-radius: 5px;
+        }
+
+        .organ-description:hover {
+            opacity: 1;
         }
 
         .organ-description-green {
-            padding: 10px;
-            width: 150px;
-            text-align: center;
-            color: white;
-            background-color: rgb(83, 121, 26);
-            margin-bottom: 5px;
-            font-weight: 600;
-            font-size: medium;
+            background-color: #5cb85c;
+            border-color: #4cae4c;
+            opacity: 0.9;
         }
 
         .organ-description-red {
-            padding: 10px;
-            width: 150px;
-            text-align: center;
-            color: white;
             background-color:rgb(223, 94, 94);
-            margin-bottom: 5px;
-            font-weight: 600;
-            font-size: medium;
+            opacity: 0.9;
         }
 
         .organ-description:hover {
@@ -126,11 +121,13 @@
         }
 
         .sample-image-border-green {
-            border: 7px solid green;
+            border: 7px solid #5cb85c;
         }
 
         .sample-image-border-blue {
             border: 7px solid #2e6da4
+            /* border: 7px solid rgb(223, 94, 94); */
+
         }
 
         .submit-preferences-button {
@@ -141,6 +138,15 @@
             font-weight: 600;
             font-size: large;
             align-self: center;
+            margin-right: 20px;
+        }
+        .submit-preferences-button:hover {
+            background-color: #0077b6;
+        }
+        .buttons-container {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
         }
     </style>
   </head>
@@ -416,6 +422,7 @@
             this.handleLeftClick = this.handleLeftClick.bind(this);
             this.handleRightClick = this.handleRightClick.bind(this);
             this.submitPreferences = this.submitPreferences.bind(this);
+            this.submitDefaultPreferences = this.submitDefaultPreferences.bind(this);
         }
         componentDidMount() {
             fetch("/get_segments",{
@@ -477,6 +484,27 @@
             })
         }
 
+        submitDefaultPreferences() {
+            let temp_samples = [1,2,3,4,5,6,7,8]
+                let temp_preferences = []
+                let temp_organ_preference = {
+                    "Accept/Reject": null,
+                    "Torso": "1",
+                    "Left Lung": '0',
+                    "Right Lung": '1',
+                    "Spine": '1',
+                    "Heart": '0'
+                }
+                for(let i=1; i<=temp_samples.length; i++)  {
+                    let id = i.toString();
+                    if(i%2 === 0) temp_preferences.push({...temp_organ_preference, "Accept/Reject":'1'})
+                    else temp_preferences.push({...temp_organ_preference, "Accept/Reject":'0'})
+                }
+                this.setState({
+                    preferences: [...temp_preferences]
+                })
+        }
+
         submitPreferences() {
             let final_preferences = this.state.preferences;
             let complete_Flag = true;
@@ -532,8 +560,8 @@
                                             className={ this.state.preferences[index]["Torso"] === null
                                                             ? "organ-description"
                                                             :  this.state.preferences[index]["Torso"] === "1" 
-                                                            ? "organ-description-green"
-                                                            : "organ-description-red" } 
+                                                            ? "organ-description organ-description-green"
+                                                            : "organ-description organ-description-red" } 
                                             onClick={(e=event,sample_id = index,organ="Torso") => this.handleLeftClick(e,sample_id,organ)} 
                                             onContextMenu={(e=event,sample_id = index,organ="Torso") => this.handleRightClick(e, sample_id, organ)}
                                         >
@@ -543,8 +571,8 @@
                                             className={ this.state.preferences[index]["Left Lung"] === null
                                                             ? "organ-description"
                                                             :  this.state.preferences[index]["Left Lung"] === "1" 
-                                                            ? "organ-description-green"
-                                                            : "organ-description-red" }
+                                                            ? "organ-description organ-description-green"
+                                                            : "organ-description organ-description-red" }
                                             onClick={(e=event,sample_id = index,organ="Left Lung") => this.handleLeftClick(e,sample_id,organ)} 
                                             onContextMenu={(e=event,sample_id = index,organ="Left Lung")=> this.handleRightClick(e, sample_id, organ)}
                                         > 
@@ -554,8 +582,8 @@
                                         className={ this.state.preferences[index]["Right Lung"] === null
                                                             ? "organ-description"
                                                             :  this.state.preferences[index]["Right Lung"] === "1" 
-                                                            ? "organ-description-green"
-                                                            : "organ-description-red" }
+                                                            ? "organ-description organ-description-green"
+                                                            : "organ-description organ-description-red" }
                                         onClick={(e=event,sample_id = index,organ="Right Lung")=> this.handleLeftClick(e,sample_id,organ)}
                                         onContextMenu={(e=event,sample_id = index,organ="Right Lung")=> this.handleRightClick(e, sample_id, organ)}
                                         >
@@ -565,8 +593,8 @@
                                         className={ this.state.preferences[index]["Spine"] === null
                                                             ? "organ-description"
                                                             :  this.state.preferences[index]["Spine"] === "1" 
-                                                            ? "organ-description-green"
-                                                            : "organ-description-red" }
+                                                            ? "organ-description organ-description-green"
+                                                            : "organ-description organ-description-red" }
                                         onClick={(e=event,sample_id = index,organ="Spine") => this.handleLeftClick(e,sample_id,organ)} 
                                         onContextMenu={(e=event,sample_id = index,organ="Spine")=> this.handleRightClick(e, sample_id, organ)} 
                                         >
@@ -576,8 +604,8 @@
                                         className={ this.state.preferences[index]["Heart"] === null
                                                             ? "organ-description"
                                                             :  this.state.preferences[index]["Heart"] === "1" 
-                                                            ? "organ-description-green"
-                                                            : "organ-description-red" }
+                                                            ? "organ-description organ-description-green"
+                                                            : "organ-description organ-description-red" }
                                         onClick={(e=event,sample_id = index,organ="Heart") => this.handleLeftClick(e,sample_id,organ)} 
                                         onContextMenu={(e=event,sample_id = index,organ="Heart")=> this.handleRightClick(e, sample_id, organ)} 
                                         >
@@ -587,8 +615,8 @@
                                         className={ this.state.preferences[index]["Accept/Reject"] === null
                                                             ? "organ-description"
                                                             :  this.state.preferences[index]["Accept/Reject"] === "1" 
-                                                            ? "organ-description-green"
-                                                            : "organ-description-red" }
+                                                            ? "organ-description organ-description-green"
+                                                            : "organ-description organ-description-red" }
                                         onClick={(e=event,sample_id = index,organ="Accept/Reject") => this.handleLeftClick(e,sample_id,organ)} 
                                         onContextMenu={(e=event,sample_id = index,organ="Accept/Reject")=> this.handleRightClick(e, sample_id, organ)} 
                                         >
@@ -607,7 +635,10 @@
                     <div className="render-samples-container">
                         {render_images}
                     </div>
-                    <button className="submit-preferences-button" onClick = {()=> this.submitPreferences()}>Submit Preferences</button>
+                    <div className="buttons-container">
+                        <button className="submit-preferences-button" onClick = {()=> this.submitDefaultPreferences()}>Dafault Preferences</button>
+                        <button className="submit-preferences-button" onClick = {()=> this.submitPreferences()}>Submit Preferences</button>
+                    </div>
                 </div>
             );
         }    

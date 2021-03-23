@@ -264,143 +264,6 @@
     <div class='col' style="text-align:center; background-color:black;"> <p style="color: white; font-weight:bold; vertical-align: center; font-size: 120%">Sample Neighborhood Enrichment</p>  
     </div>
 </div>
-     <div class="row mb-2">
-         <div class='col-2'> 
-            
-            <div class="row mb-1">
-                <div class="col-12" style="text-align:center; background-color:lightgray;">
-                    <div class="row">
-                        <div class="col"> <b>Select Instance</b> </div>
-                        <div class="col">
-                               <button type="button" id="prev_sample" class="btn btn-primary btn-block" onclick="select_prev_sample()"><b> < </b></button>
-                             </div>
-
-                             <div class="col">
-                              <button type="button" id="next_sample" class="btn btn-primary btn-block" onclick="select_next_sample()"><b> > </b></button>
-                             </div>     
-                        </div>
-                    </div>
-            </div>
-
-            <div class="row mb-3">
-
-                <div class="col-6">
-                    <button type="button" class="btn btn-success btn-block"><b>Accept</b> <input type="radio" name="Accept/Reject" value=0></button> </button>
-                </div>
-            
-                <div class="col-6">
-                    <button type="button" class="btn btn-danger btn-block"> <b>Reject</b> <input type="radio" name="Accept/Reject"  value=1> </button>        
-                </div>
-
-            </div>
-
-            <div class="row mb-3">
-                <div class="col-6">
-                    <button type="button" class="btn btn-success btn-block"><b>Torso</b> <input type="radio" name="Torso"  value=0></button>
-                </div>
-            
-                <div class="col-6">
-                    <button type="button" class="btn btn-danger btn-block"><b>Torso</b> <input type="radio" name="Torso" value=1> </button>        
-                </div>
-            </div>
-
-            <div class="row mb-3">
-                <div class="col-6">
-                    <button type="button" class="btn btn-success btn-block"> <b>Lung (L)</b> <input type="radio" name="Left Lung" value=0></button>
-                </div>
-            
-                <div class="col-6">
-                    <button type="button" class="btn btn-danger btn-block"><b>Lung (L)</b> <input type="radio" name="Left Lung"  value=1> </button>        
-                </div>
-            </div>
-
-            <div class="row mb-3">
-                <div class="col-6">
-                    <button type="button" class="btn btn-success btn-block"><b>Lung (R)</b> <input type="radio" name="Right Lung" value=0></button>
-                </div>
-            
-                <div class="col-6">
-                    <button type="button" class="btn btn-danger btn-block"><b>Lung (R)</b> <input type="radio" name="Right Lung" value=1> </button>       
-                </div>
-            </div>
-
-            <div class="row mb-3">
-                <div class="col-6">
-                    <button type="button" class="btn btn-success btn-block"><b>Spine</b> <input type="radio" name="Spine" value=0></button>
-                </div>
-            
-                <div class="col-6">
-                    <button type="button" class="btn btn-danger btn-block"><b>Spine</b> <input type="radio" name="Spine"  value=1></button>        
-                </div>
-            </div>
-
-            <div class="row mb-3">
-                <div class="col-6">
-                    <button type="button" class="btn btn-success btn-block"><b>Heart</b> <input type="radio" name="Heart" value=0></button>
-                </div>
-            
-                <div class="col-6">
-                    <button type="button" class="btn btn-danger btn-block"><b>Heart</b> <input type="radio" name="Heart" value=1></button>        
-                </div>
-            </div>
-
-            <div class="row mb-1">
-                <div class="col-12">
-                    <button type="button" class="btn btn-primary btn-block" onclick="gather_preferences()"> <b>Submit Preferences</b></button>
-                </div>
-            </div>
-
-            <div class="row mb-1">
-                <div class="col-12">
-                    <button type="button" class="btn btn-primary btn-block" onclick="submit_final_pref_set()"> <b>Done</b></button>
-                </div>
-            </div>
-
-         </div>
-         <div class='col-10'>
-             
-             <div class="row mb-2">
-
-                 <div class="col-3">
-                     <img id="sample_1" class="rounded mx-auto d-block" alt="..." width="190" height="190" style="width:190px height=190px">
-                 </div>
-
-                 <div class="col-3">
-                     <img id="sample_2" class="rounded mx-auto d-block" alt="..." width="190" height="190" style="width:190px height=190px">
-                 </div>
-
-                 <div class="col-3">
-                      <img id="sample_3" class="rounded mx-auto d-block" alt="..." width="190" height="190" style="width:190px height=190px">
-                 </div>
-
-                 <div class="col-3">
-                     <img id="sample_4" class="rounded mx-auto d-block" alt="..." width="190" height="190" style="width:190px height=190px">
-                 </div>
-
-             </div>
-
-             <div class="row mb-2">
-
-                 <div class="col-3">
-                     <img id="sample_5" class="rounded mx-auto d-block" alt="..." width="190" height="190" style="width:190px height=190px">
-                 </div>
-
-                 <div class="col-3">
-                     <img id="sample_6" class="rounded mx-auto d-block" alt="..." width="190" height="190" style="width:190px height=190px">
-                 </div>
-
-                 <div class="col-3">
-                     <img id="sample_7" class="rounded mx-auto d-block" alt="..." width="190" height="190" style="width:190px height=190px">
-                 </div>
-
-                 <div class="col-3">
-                     <img id="sample_8" class="rounded mx-auto d-block" alt="..." width="190" height="190" style="width:190px height=190px">
-                 </div>
-
-             </div>
-
-         </div>
-     </div>
  </div>
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
@@ -417,7 +280,8 @@
             this.state = {
                 data: {},
                 sampleImages: [],
-                preferences: []
+                preferences: [],
+                sliderValue: 0
             }
             this.handleLeftClick = this.handleLeftClick.bind(this);
             this.handleRightClick = this.handleRightClick.bind(this);
@@ -425,9 +289,24 @@
             this.submitDefaultPreferences = this.submitDefaultPreferences.bind(this);
             this.setInitialPreferences = this.setInitialPreferences.bind(this);
             this.getSegments = this.getSegments.bind(this);
+            this.set_slider_value = this.set_slider_value.bind(this);
+            this.setImages = this.setImages.bind(this)   
+            this.set_black_images = this.set_black_images.bind(this);
+            this.reset_slider = this.reset_slider.bind(this);  
+            this.reset_dashboard = this.reset_dashboard.bind(this); 
         }
         componentDidMount() {
-            this.getSegments();
+            this.reset_dashboard();
+        }
+
+        set_black_images() {
+            console.log("Setting Images");
+            var img_tags = document.getElementsByTagName('img');
+
+            for (var i=0; i< img_tags.length; i++)
+            {
+                img_tags[i].src = "/static/black_image.jpeg";
+            }
         }
 
         getSegments() {
@@ -439,7 +318,6 @@
             })
             .then(response => response.json())
             .then(data => {
-
                 // Sample Imges URL to Images array
                 let images = [];
                 let defaultName = "sample_"
@@ -450,9 +328,10 @@
                 this.setState({
                     data: {...data},
                     sampleImages: [...images],
+                    sliderValue: data.level
                 })
             })
-            this.setInitialPreferences()
+            this.setInitialPreferences();
         }
 
         handleLeftClick(e,id, organ) {
@@ -495,25 +374,24 @@
         }
 
         setInitialPreferences() {
-
-                    // TODO: Update it to original sample received
-                    let temp_samples = [1,2,3,4,5,6,7,8]
-                let temp_preferences = []
-                let temp_organ_preference = {
-                    "Accept/Reject": null,
-                    "Torso": null,
-                    "Left Lung": null,
-                    "Right Lung": null,
-                    "Spine": null,
-                    "Heart": null
-                }
-                for(let i=1; i<=temp_samples.length; i++)  {
-                    let id = i.toString();
-                    temp_preferences.push({...temp_organ_preference})
-                }
-                this.setState({
-                    preferences: [...temp_preferences]
-                })
+            console.log("Initial Preferences");
+            let temp_samples = [1,2,3,4,5,6,7,8]
+            let temp_preferences = []
+            let temp_organ_preference = {
+                "Accept/Reject": null,
+                "Torso": null,
+                "Left Lung": null,
+                "Right Lung": null,
+                "Spine": null,
+                "Heart": null
+            }
+            for(let i=1; i<=temp_samples.length; i++)  {
+                let id = i.toString();
+                temp_preferences.push({...temp_organ_preference})
+            }
+            this.setState({
+                preferences: [...temp_preferences]
+            })
         }
 
         submitPreferences() {
@@ -534,7 +412,6 @@
                 for(let i=0;i<final_preferences.length;i++){
                     pref_req[i+1] = {...final_preferences[i]}
                 }
-                // TODO: Reset Dashboard
                 $.ajax({
                     type:"POST",
                     url: "/submit_prefs",
@@ -543,12 +420,41 @@
                     success: function(data){
                        alert("All the preferences have been submitted")
                     }
+                }).then(()=>{
+                    this.reset_dashboard();
                 })
             }
             else alert("Please submit the preferences for all the samples")
         }
 
+        set_slider_value(){
+            document.getElementById("pca_slider").value = this.state.sliderValue;
+        }
+
+        reset_slider(){
+            this.setState({
+                sliderValue: 0
+            },()=> {
+                this.set_slider_value()
+            })
+        }
+
+        setImages() {
+            document.getElementById("source").src = this.state.data.img1
+            document.getElementById("dest").src = this.state.data.img2
+            document.getElementById("interpolated").src = this.state.data.img_mid
+        }
+
+        reset_dashboard(){
+            this.set_black_images();
+            // this.setInitialPreferences();
+            this.reset_slider();
+            this.getSegments()
+        }
+
         render() { 
+            this.set_slider_value();
+            if(Object.keys(this.state.data).length !== 0) this.setImages()
             let temp_samples = [1,2,3,4,5,6,7,8]
             const render_images = temp_samples.map((img_src,index) => {
                     // Update it to original images received
@@ -558,7 +464,7 @@
                                 this.state.preferences.length ?
                                 <div className="sample-image-container">
                                     <img 
-                                        src={""} 
+                                        src={"/static/black_image.jpeg"} 
                                         className={ this.state.preferences[index]["Accept/Reject"] === null
                                                             ? "sample-image"
                                                             :  this.state.preferences[index]["Accept/Reject"] === "1" 
@@ -648,7 +554,7 @@
                     </div>
                     <div className="buttons-container">
                         <button className="submit-preferences-button" onClick = {()=> this.submitDefaultPreferences()}>Default Preferences</button>
-                        <button className="submit-preferences-button" onClick = {()=> this.setInitialPreferences()}>Reset Defaults</button>
+                        <button className="submit-preferences-button" onClick = {()=> this.setInitialPreferences()}>Reset Preferences</button>
                         <button className="submit-preferences-button" onClick = {()=> this.submitPreferences()}>Submit Preferences</button>
                     </div>
                 </div>

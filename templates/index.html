@@ -423,8 +423,14 @@
             this.handleRightClick = this.handleRightClick.bind(this);
             this.submitPreferences = this.submitPreferences.bind(this);
             this.submitDefaultPreferences = this.submitDefaultPreferences.bind(this);
+            this.setInitialPreferences = this.setInitialPreferences.bind(this);
+            this.getSegments = this.getSegments.bind(this);
         }
         componentDidMount() {
+            this.getSegments();
+        }
+
+        getSegments() {
             fetch("/get_segments",{
                 method: "GET",
                 headers: {
@@ -446,24 +452,7 @@
                     sampleImages: [...images],
                 })
             })
-            // TODO: Update it to original sample received
-            let temp_samples = [1,2,3,4,5,6,7,8]
-                let temp_preferences = []
-                let temp_organ_preference = {
-                    "Accept/Reject": null,
-                    "Torso": null,
-                    "Left Lung": null,
-                    "Right Lung": null,
-                    "Spine": null,
-                    "Heart": null
-                }
-                for(let i=1; i<=temp_samples.length; i++)  {
-                    let id = i.toString();
-                    temp_preferences.push({...temp_organ_preference})
-                }
-                this.setState({
-                    preferences: [...temp_preferences]
-                })
+            this.setInitialPreferences()
         }
 
         handleLeftClick(e,id, organ) {
@@ -499,6 +488,28 @@
                     let id = i.toString();
                     if(i%2 === 0) temp_preferences.push({...temp_organ_preference, "Accept/Reject":'1'})
                     else temp_preferences.push({...temp_organ_preference, "Accept/Reject":'0'})
+                }
+                this.setState({
+                    preferences: [...temp_preferences]
+                })
+        }
+
+        setInitialPreferences() {
+
+                    // TODO: Update it to original sample received
+                    let temp_samples = [1,2,3,4,5,6,7,8]
+                let temp_preferences = []
+                let temp_organ_preference = {
+                    "Accept/Reject": null,
+                    "Torso": null,
+                    "Left Lung": null,
+                    "Right Lung": null,
+                    "Spine": null,
+                    "Heart": null
+                }
+                for(let i=1; i<=temp_samples.length; i++)  {
+                    let id = i.toString();
+                    temp_preferences.push({...temp_organ_preference})
                 }
                 this.setState({
                     preferences: [...temp_preferences]
@@ -636,7 +647,8 @@
                         {render_images}
                     </div>
                     <div className="buttons-container">
-                        <button className="submit-preferences-button" onClick = {()=> this.submitDefaultPreferences()}>Dafault Preferences</button>
+                        <button className="submit-preferences-button" onClick = {()=> this.submitDefaultPreferences()}>Default Preferences</button>
+                        <button className="submit-preferences-button" onClick = {()=> this.setInitialPreferences()}>Reset Defaults</button>
                         <button className="submit-preferences-button" onClick = {()=> this.submitPreferences()}>Submit Preferences</button>
                     </div>
                 </div>

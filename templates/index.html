@@ -458,15 +458,15 @@
             this.set_slider_value();
             if(Object.keys(this.state.data).length !== 0) this.setImages()
             let temp_samples = [1,2,3,4,5,6,7,8]
-            const render_images = this.state.sampleImages.map((img_src,index) => {
-                    // Update it to original images received
+            const render_images = temp_samples.map((img_src,index) => {
+                    // Update it to original images received (this.state.sampleImages)
                     return (
                         <div key={index+1} >
                             {
                                 this.state.preferences.length ?
                                 <div className="sample-image-container">
                                     <img 
-                                        src= {img_src}
+                                        src= {"/static/black_image.jpeg"}   // update this to img_src once API is fixed
                                         className={ this.state.preferences[index]["Accept/Reject"] === null
                                                             ? "sample-image"
                                                             :  this.state.preferences[index]["Accept/Reject"] === "1" 

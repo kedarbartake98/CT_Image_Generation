@@ -61,7 +61,7 @@
     flex-direction: row;
     margin: 10px;
     align-items: center;
-    height: calc(100% - 20px)
+    height: calc(100% - 20px);
 }
 .organ-description {
     padding: 5px;

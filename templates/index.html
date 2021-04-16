@@ -152,7 +152,7 @@
             this.handleLeftClick = this.handleLeftClick.bind(this);
             this.handleRightClick = this.handleRightClick.bind(this);
             this.submitPreferences = this.submitPreferences.bind(this);
-            this.submitDefaultPreferences = this.submitDefaultPreferences.bind(this);
+            // this.submitDefaultPreferences = this.submitDefaultPreferences.bind(this);
             this.setInitialPreferences = this.setInitialPreferences.bind(this);
             this.getSegments = this.getSegments.bind(this);
             this.set_slider_value = this.set_slider_value.bind(this);
@@ -217,38 +217,38 @@
             })
         }
 
-        submitDefaultPreferences() {
-            let temp_samples = [1,2,3,4,5,6,7,8]
-                let temp_preferences = []
-                let temp_organ_preference = {
-                    "Accept/Reject": null,
-                    "Torso": "1",
-                    "Left Lung": '0',
-                    "Right Lung": '1',
-                    "Spine": '1',
-                    "Heart": '0'
-                }
-                for(let i=1; i<=temp_samples.length; i++)  {
-                    let id = i.toString();
-                    if(i%2 === 0) temp_preferences.push({...temp_organ_preference, "Accept/Reject":'1'})
-                    else temp_preferences.push({...temp_organ_preference, "Accept/Reject":'0'})
-                }
-                this.setState({
-                    preferences: [...temp_preferences]
-                })
-        }
+        // submitDefaultPreferences() {
+        //     let temp_samples = [1,2,3,4,5,6,7,8]
+        //         let temp_preferences = []
+        //         let temp_organ_preference = {
+        //             "Accept/Reject": null,
+        //             "Torso": "1",
+        //             "Left Lung": '0',
+        //             "Right Lung": '1',
+        //             "Spine": '1',
+        //             "Heart": '0'
+        //         }
+        //         for(let i=1; i<=temp_samples.length; i++)  {
+        //             let id = i.toString();
+        //             if(i%2 === 0) temp_preferences.push({...temp_organ_preference, "Accept/Reject":'1'})
+        //             else temp_preferences.push({...temp_organ_preference, "Accept/Reject":'0'})
+        //         }
+        //         this.setState({
+        //             preferences: [...temp_preferences]
+        //         })
+        // }
 
         setInitialPreferences() {
             console.log("Initial Preferences");
             let temp_samples = [1,2,3,4,5,6,7,8]
             let temp_preferences = []
             let temp_organ_preference = {
-                "Accept/Reject": null,
-                "Torso": null,
-                "Left Lung": null,
-                "Right Lung": null,
-                "Spine": null,
-                "Heart": null
+                "Accept/Reject": "0",
+                "Torso": "1",
+                "Left Lung": "1",
+                "Right Lung": "1",
+                "Spine": "1",
+                "Heart": "1"
             }
             for(let i=1; i<=temp_samples.length; i++)  {
                 let id = i.toString();
@@ -261,18 +261,18 @@
 
         submitPreferences() {
             let final_preferences = this.state.preferences;
-            let complete_Flag = true;
-            for(let i=0; i<final_preferences.length; i++) {
-                let pref = final_preferences[i];
-                for(let key in pref){
-                    if(pref[key] === null) {
-                        complete_Flag = false
-                        break;
-                    }
-                }
-                if(!complete_Flag) break;
-            }
-            if(complete_Flag){
+            // let complete_Flag = true;
+            // for(let i=0; i<final_preferences.length; i++) {
+            //     let pref = final_preferences[i];
+            //     for(let key in pref){
+            //         if(pref[key] === null) {
+            //             complete_Flag = false
+            //             break;
+            //         }
+            //     }
+            //     if(!complete_Flag) break;
+            // }
+            // if(complete_Flag){
                 let pref_req = {}
                 for(let i=0;i<final_preferences.length;i++){
                     pref_req[i+1] = {...final_preferences[i]}
@@ -282,14 +282,14 @@
                     url: "/submit_prefs",
                     dataType:'json',
                     data: {preferences: JSON.stringify(pref_req)},
-                    success: function(data){
-                       alert("All the preferences have been submitted")
-                    }
+                    // success: function(data){
+                    //    alert("All the preferences have been submitted")
+                    // }
                 }).then(()=>{
                     this.reset_dashboard();
                 })
-            }
-            else alert("Please submit the preferences for all the samples")
+            // }
+            // else alert("Please submit the preferences for all the samples")
         }
 
         set_slider_value(){
@@ -420,7 +420,6 @@
                         {render_images}
                     </div>
                     <div className="buttons-container">
-                        <button className="submit-preferences-button" onClick = {()=> this.submitDefaultPreferences()}>Default Preferences</button>
                         <button className="submit-preferences-button" onClick = {()=> this.setInitialPreferences()}>Reset Preferences</button>
                         <button className="submit-preferences-button" onClick = {()=> this.submitPreferences()}>Submit Preferences</button>
                     </div>

@@ -126,7 +126,7 @@
          </div>
      </div>
      <!-- First Row done -->
-<div class="row mb-1"> 
+<div class="row mb-1 samples-heading"> 
     <div class='col' style="text-align:center; background-color:black;"> <p style="color: white; font-weight:bold; vertical-align: center; font-size: 120%">Sample Neighborhood Enrichment</p>  
     </div>
 </div>
@@ -327,19 +327,18 @@
             const render_images = temp_samples.map((img_src,index) => {
                     // Update it to original images received (this.state.sampleImages)
                     return (
-                        <div key={index+1} >
+                        <div key={index+1} className="image-buttons-main-container">
                             {
                                 this.state.preferences.length ?
                                 <div className="sample-image-container">
                                     <img 
-                                        src= {"/static/black_image.jpeg"}   // update this to img_src once API is fixed
+                                        src= {"/static/black_image.jpeg"}   // update this to img_src once API is fixed or "/static/black_image.jpeg"
                                         className={ this.state.preferences[index]["Accept/Reject"] === null
                                                             ? "sample-image"
                                                             :  this.state.preferences[index]["Accept/Reject"] === "1" 
                                                             ? "sample-image sample-image-border-green"
                                                             : "sample-image sample-image-border-blue" }
                                     />
-
                                     <div>
                                         <div 
                                             className={ this.state.preferences[index]["Torso"] === null
@@ -405,11 +404,11 @@
                                         onClick={(e=event,sample_id = index,organ="Accept/Reject") => this.handleLeftClick(e,sample_id,organ)} 
                                         onContextMenu={(e=event,sample_id = index,organ="Accept/Reject")=> this.handleRightClick(e, sample_id, organ)} 
                                         >
-                                            Accept / Reject
+                                            Accept
                                         </div>
                                     </div>
                                 </div>
-                                : ""
+                                : "Waiting for Images......"
                             }
                         </div>
                     )

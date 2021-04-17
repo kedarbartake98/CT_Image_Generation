@@ -147,6 +147,7 @@
                 data: {},
                 sampleImages: [],
                 preferences: [],
+                disableAccept:[],
                 sliderValue: 0
             }
             this.handleLeftClick = this.handleLeftClick.bind(this);
@@ -160,6 +161,7 @@
             this.set_black_images = this.set_black_images.bind(this);
             this.reset_slider = this.reset_slider.bind(this);  
             this.reset_dashboard = this.reset_dashboard.bind(this); 
+            this.trackDisabled = this.trackDisabled.bind(this);
         }
         componentDidMount() {
             this.reset_dashboard();
@@ -199,13 +201,43 @@
             })
         }
 
+        trackDisabled(id) {
+            let temp_preferences = this.state.preferences;
+            let disabledIDs = this.state.disableAccept;
+            if(temp_preferences[id]["Torso"] === "1" 
+                && temp_preferences[id]["Left Lung"] === "1" 
+                && temp_preferences[id]["Right Lung"] === "1" 
+                && temp_preferences[id]["Spine"] === "1" 
+                && temp_preferences[id]["Heart"] === "1") {
+                    if(disabledIDs.indexOf(id)!== -1) {
+                        let updatedIDs = disabledIDs.filter(item => item !== id)
+                        this.setState({
+                            disableAccept: [...updatedIDs]
+                        })
+                    }
+                }
+            else {
+                temp_preferences[id]["Accept/Reject"] = '0';
+                if(disabledIDs.indexOf(id) === -1) {
+                    disabledIDs = [...disabledIDs, id]
+                }
+                this.setState({
+                    disableAccept : [...disabledIDs],
+                    preferences : temp_preferences
+                })
+            }
+        }
+
         handleLeftClick(e,id, organ) {
             let temp_preferences = this.state.preferences;
             temp_preferences[id][organ] = '1';
             this.setState({
                 preferences: temp_preferences
+            },  () => {
+                if(organ !== "Accept/Reject") {
+                    this.trackDisabled(id)
+                }
             })
-
         }
 
         handleRightClick(e, id, organ) {
@@ -214,29 +246,12 @@
             temp_preferences[id][organ] = '0';
             this.setState({
                 preferences: temp_preferences
+            }, () => {
+                if(organ !== "Accept/Reject") {
+                    this.trackDisabled(id)
+                }
             })
         }
-
-        // submitDefaultPreferences() {
-        //     let temp_samples = [1,2,3,4,5,6,7,8]
-        //         let temp_preferences = []
-        //         let temp_organ_preference = {
-        //             "Accept/Reject": null,
-        //             "Torso": "1",
-        //             "Left Lung": '0',
-        //             "Right Lung": '1',
-        //             "Spine": '1',
-        //             "Heart": '0'
-        //         }
-        //         for(let i=1; i<=temp_samples.length; i++)  {
-        //             let id = i.toString();
-        //             if(i%2 === 0) temp_preferences.push({...temp_organ_preference, "Accept/Reject":'1'})
-        //             else temp_preferences.push({...temp_organ_preference, "Accept/Reject":'0'})
-        //         }
-        //         this.setState({
-        //             preferences: [...temp_preferences]
-        //         })
-        // }
 
         setInitialPreferences() {
             console.log("Initial Preferences");
@@ -261,35 +276,18 @@
 
         submitPreferences() {
             let final_preferences = this.state.preferences;
-            // let complete_Flag = true;
-            // for(let i=0; i<final_preferences.length; i++) {
-            //     let pref = final_preferences[i];
-            //     for(let key in pref){
-            //         if(pref[key] === null) {
-            //             complete_Flag = false
-            //             break;
-            //         }
-            //     }
-            //     if(!complete_Flag) break;
-            // }
-            // if(complete_Flag){
-                let pref_req = {}
-                for(let i=0;i<final_preferences.length;i++){
-                    pref_req[i+1] = {...final_preferences[i]}
-                }
-                $.ajax({
-                    type:"POST",
-                    url: "/submit_prefs",
-                    dataType:'json',
-                    data: {preferences: JSON.stringify(pref_req)},
-                    // success: function(data){
-                    //    alert("All the preferences have been submitted")
-                    // }
-                }).then(()=>{
-                    this.reset_dashboard();
-                })
-            // }
-            // else alert("Please submit the preferences for all the samples")
+            let pref_req = {}
+            for(let i=0;i<final_preferences.length;i++){
+                pref_req[i+1] = {...final_preferences[i]}
+            }
+            $.ajax({
+                type:"POST",
+                url: "/submit_prefs",
+                dataType:'json',
+                data: {preferences: JSON.stringify(pref_req)},
+            }).then(()=>{
+                this.reset_dashboard();
+            })
         }
 
         set_slider_value(){
@@ -333,17 +331,13 @@
                                 <div className="sample-image-container">
                                     <img 
                                         src= {"/static/black_image.jpeg"}   // update this to img_src once API is fixed or "/static/black_image.jpeg"
-                                        className={ this.state.preferences[index]["Accept/Reject"] === null
-                                                            ? "sample-image"
-                                                            :  this.state.preferences[index]["Accept/Reject"] === "1" 
+                                        className={ this.state.preferences[index]["Accept/Reject"] === "1" 
                                                             ? "sample-image sample-image-border-green"
                                                             : "sample-image sample-image-border-blue" }
                                     />
                                     <div>
                                         <div 
-                                            className={ this.state.preferences[index]["Torso"] === null
-                                                            ? "organ-description"
-                                                            :  this.state.preferences[index]["Torso"] === "1" 
+                                            className={ this.state.preferences[index]["Torso"] === "1" 
                                                             ? "organ-description organ-description-green"
                                                             : "organ-description organ-description-red" } 
                                             onClick={(e=event,sample_id = index,organ="Torso") => this.handleLeftClick(e,sample_id,organ)} 
@@ -352,9 +346,7 @@
                                             Torso
                                         </div>
                                         <div 
-                                            className={ this.state.preferences[index]["Left Lung"] === null
-                                                            ? "organ-description"
-                                                            :  this.state.preferences[index]["Left Lung"] === "1" 
+                                            className={ this.state.preferences[index]["Left Lung"] === "1" 
                                                             ? "organ-description organ-description-green"
                                                             : "organ-description organ-description-red" }
                                             onClick={(e=event,sample_id = index,organ="Left Lung") => this.handleLeftClick(e,sample_id,organ)} 
@@ -363,9 +355,7 @@
                                             Lung (L)
                                         </div>
                                         <div 
-                                        className={ this.state.preferences[index]["Right Lung"] === null
-                                                            ? "organ-description"
-                                                            :  this.state.preferences[index]["Right Lung"] === "1" 
+                                        className={ this.state.preferences[index]["Right Lung"] === "1" 
                                                             ? "organ-description organ-description-green"
                                                             : "organ-description organ-description-red" }
                                         onClick={(e=event,sample_id = index,organ="Right Lung")=> this.handleLeftClick(e,sample_id,organ)}
@@ -374,9 +364,7 @@
                                             Lung (R)
                                         </div>
                                         <div 
-                                        className={ this.state.preferences[index]["Spine"] === null
-                                                            ? "organ-description"
-                                                            :  this.state.preferences[index]["Spine"] === "1" 
+                                        className={ this.state.preferences[index]["Spine"] === "1" 
                                                             ? "organ-description organ-description-green"
                                                             : "organ-description organ-description-red" }
                                         onClick={(e=event,sample_id = index,organ="Spine") => this.handleLeftClick(e,sample_id,organ)} 
@@ -385,9 +373,7 @@
                                             Spine
                                         </div>
                                         <div 
-                                        className={ this.state.preferences[index]["Heart"] === null
-                                                            ? "organ-description"
-                                                            :  this.state.preferences[index]["Heart"] === "1" 
+                                        className={ this.state.preferences[index]["Heart"] === "1" 
                                                             ? "organ-description organ-description-green"
                                                             : "organ-description organ-description-red" }
                                         onClick={(e=event,sample_id = index,organ="Heart") => this.handleLeftClick(e,sample_id,organ)} 
@@ -396,10 +382,10 @@
                                             Heart
                                         </div>
                                         <div 
-                                        className={ this.state.preferences[index]["Accept/Reject"] === null
-                                                            ? "organ-description"
-                                                            :  this.state.preferences[index]["Accept/Reject"] === "1" 
+                                        className={ this.state.preferences[index]["Accept/Reject"] === "1" 
                                                             ? "organ-description organ-description-green"
+                                                            : this.state.disableAccept.indexOf(index) !== -1 
+                                                            ? "organ-description organ-description-red disabled-class" 
                                                             : "organ-description organ-description-red" }
                                         onClick={(e=event,sample_id = index,organ="Accept/Reject") => this.handleLeftClick(e,sample_id,organ)} 
                                         onContextMenu={(e=event,sample_id = index,organ="Accept/Reject")=> this.handleRightClick(e, sample_id, organ)} 

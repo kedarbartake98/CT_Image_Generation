@@ -140,3 +140,8 @@
 .image-buttons-main-container {
     width:25vw;
 }
+
+.disabled-class {
+    pointer-events: none;
+    opacity: 0.7;
+}

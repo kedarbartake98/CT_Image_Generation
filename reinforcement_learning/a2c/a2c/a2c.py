@@ -465,7 +465,7 @@ def learn(policy,
             fps_tstart = time.time()
 
             print("Trained policy for {} time steps".format(update * nbatch))
-            store_images(mb_states, update)
+#             store_images(mb_states, update)
 
             print(tot_plc_loss / c, tot_value_loss / c, tot_ev_po / c_ev_po, tot_ev_ne / c_ev_ne)
             tot_plc_loss = 0

@@ -8,7 +8,7 @@ import easy_tf_log
 import numpy as np
 from numpy.testing import assert_equal
 import tensorflow as tf
-
+from PIL import Image
 # from a2c import logger
 # from a2c.common import explained_variance, set_global_seeds
 from reinforcement_learning.pref_db import Segment
@@ -125,25 +125,25 @@ class Runner(object):  # Trains workers, does actions etc and pushed clips for p
         self.model = model
 #         nh, nw, nc = env.observation_space.shape
         nh = env.observation_space.shape[0]
-        nenv = env.nenvs # 8 
+        nenvs = env.nenvs # 8 
 #         self.batch_ob_shape = (nenv * nsteps, nh, nw, nc * nstack) nstack  = 1, 
 #         since we are not looking back 4 frames
-        self.batch_ob_shape = (nenv * nsteps, nh)
+        self.batch_ob_shape = (nenvs * nsteps, nh)
 #         self.obs = np.zeros((nenv, nh), dtype=np.uint8)
 #         # The first stack of 4 frames: the first 3 frames are zeros,
 #         # with the last frame coming from env.reset().
-        self.obs, self.states = env.reset()
+        # self.obs, self.states = env.reset()
 #         self.update_obs(obs)
         self.gamma = gamma
         self.nsteps = nsteps
 #         self.states = model.initial_state
-        self.dones = [False for _ in range(nenv)]  # [0]
+        # self.dones = [False for _ in range(nenv)]  # [0]
 
         self.gen_segments = gen_segments
         self.segment = Segment()
         self.seg_pipe = seg_pipe
 
-        self.orig_reward = [0 for _ in range(nenv)]  # [0]
+        # self.orig_reward = [0 for _ in range(nenv)]  # [0]
         self.reward_predictor = reward_predictor
 
 #         self.episode_frames = []
@@ -193,20 +193,10 @@ class Runner(object):  # Trains workers, does actions etc and pushed clips for p
                         # the segment and keep on going.
                     self.segment = Segment()
 
-#     def update_episode_frame_buffer(self, mb_obs, mb_dones):
-#         e0_obs = mb_obs[0]
-#         e0_dones = mb_dones[0]
-#         for step in range(self.nsteps):
-#             # Here we only need to send the last frame (the most recent one)
-#             # from the 4-frame stack, because we're just showing output to
-#             # the user.
-#             self.episode_frames.append(e0_obs[step, :, :, -1])
-#             if e0_dones[step]:
-#                 self.episode_vid_queue.put(self.episode_frames)
-#                 self.episode_frames = []
-
     def run(self):
+        self.obs, self.states = self.env.reset()
         nenvs = self.env.nenvs
+        self.dones = [False for _ in range(nenvs)] 
         mb_obs, mb_states, mb_rewards, mb_actions, mb_values, mb_dones = \
             [], [], [], [], [], []
 #         mb_states = self.states
@@ -244,70 +234,33 @@ class Runner(object):  # Trains workers, does actions etc and pushed clips for p
         # before we'd actually run any steps, so drop it.
         mb_dones = mb_dones[:, 1:]
 
-        # Log original rewards
-#         for env_n, (rs, dones) in enumerate(zip(mb_rewards, mb_dones)):
-#             assert_equal(rs.shape, (self.nsteps, ))
-#             assert_equal(dones.shape, (self.nsteps, ))
-#             for step_n in range(self.nsteps):
-#                 self.orig_reward[env_n] += rs[step_n]
-#                 if dones[step_n]:
-#                     easy_tf_log.tflog(
-#                         "orig_reward_{}".format(env_n),
-#                         self.orig_reward[env_n])
-#                     self.orig_reward[env_n] = 0
-
-
-        # Generate segments
-        # (For MovingDot, this has to happen _after_ we've encoded the action
-        # in the observations.)
-        if self.gen_segments: # should be after reward_predictor ??? same concept found in
-            #pref interface
-            # run it for only one environment, get eight different outputs
-            # and 
-#             for _ in range(self.nsteps):
-#             obs = mb_obs[0]
-#             action, alt_action, _, _ = self.model.step(obs)
-#             action_act, alt_action_act, _, _ = self.model.step(obs)
-#             action, alt_action, _, _ = self.model.step(self.obs)
-        
-#             gen1_mb_obs.append(np.copy(self.obs))
-#             gen2_mb_obs.append(np.copy(self.obs))
-#             gen3_mb_obs.append(np.copy(self.obs))
-#             gen4_mb_obs.append(np.copy(self.obs))
-#             gen5_mb_obs.append(np.copy(self.obs))
-#             gen6_mb_obs.append(np.copy(self.obs))
-#             gen7_mb_obs.append(np.copy(self.obs))
-#             gen8_mb_obs.append(np.copy(self.obs))
-#             mb_dones.append(self.dones)
-#             # len({obs, rewards, dones}) == nenvs
-#             obs, rewards, dones, _ = self.env.step(actions) # remove rewards
-#             self.dones = dones
-#             self.obs = obs
-#             mb_rewards.append(rewards)
+        if self.gen_segments:
             self.update_segment_buffer(mb_states, mb_rewards, mb_dones)
 
-        # Replace rewards with those from reward predictor
-        # (Note that this also needs to be done _after_ we've encoded the
-        # action.)
-        logging.debug("Original rewards:\n%s", mb_rewards)
-        if self.reward_predictor: # Always true in our case # Find a way to merge both rewards
-            assert_equal(mb_states.shape, (nenvs, self.nsteps, 121)) # this is where the shap.....
-            mb_states_allenvs = mb_states.reshape(nenvs * self.nsteps, 121)
-            mb_images_allenvs, rew = vectors_to_images(mb_states_allenvs)
-            if mb_images_allenvs == None:
-                rewards_allenvs = np.zeros((nenvs * self.nsteps,))
-            else:
-                assert_equal(mb_images_allenvs, (nenvs * self.nsteps, 512, 512))
-                rewards_allenvs = self.reward_predictor.reward(mb_images_allenvs)
-                rewards_allenvs = np.where(rew == 0, -1, rewards_allenvs)
-                assert_equal(rewards_allenvs.shape, (nenvs * self.nsteps, ))
-            ### TODO : make -1/-2.. and 1 # Can also use np.where
+        assert_equal(mb_states.shape, (nenvs, self.nsteps, 121)) # this is where the shap.....
+        mb_states_allenvs = mb_states.reshape(nenvs * self.nsteps, 121)
+        mb_images_allenvs, rew = vectors_to_images(mb_states_allenvs)
+        if mb_images_allenvs.shape[0] == 2:
+            return np.zeros((2,2)), np.zeros((2,2)), np.zeros((2,2)), np.zeros((2,2)), np.zeros((2,2))
+        # with open('test.npy', 'wb') as f:
+        #     np.save(f, mb_images_allenvs)
+        # f.close()
+        # if mb_images_allenvs == None:
+        #     rewards_allenvs = np.zeros((nenvs * self.nsteps,))
+        #     print('NOOONE')
+        # else:
+        assert_equal(mb_images_allenvs.shape, (nenvs * self.nsteps, 256, 256))
+        rewards_allenvs = self.reward_predictor.raw_rewards(mb_images_allenvs)
+        rewards_allenvs = np.where(rew == 0, 0.0, rewards_allenvs)
+        assert_equal(rewards_allenvs.shape, (nenvs * self.nsteps, ))
+        # print('NOOOOT    NOOONE')
+        ### TODO : make -1/-2.. and 1 # Can also use np.where
 #             mb_rewards = np.multiply(mb_rewards*(rewards_allenvs.reshape(nenvs, self.nsteps)))
-            rewards_allenvs = rewards_allenvs.reshape(nenvs, self.nsteps)
-            mb_rewards = np.where(mb_rewards==-1, mb_rewards, rewards_allenvs)
-            assert_equal(mb_rewards.shape, (nenvs, self.nsteps))
+        rewards_allenvs = rewards_allenvs.reshape(nenvs, self.nsteps)
+        mb_rewards = np.where(mb_rewards==-1, 0.0, rewards_allenvs)
+        assert_equal(mb_rewards.shape, (nenvs, self.nsteps))
 
-            logging.debug("Predicted rewards:\n%s", mb_rewards)
+        logging.debug("Predicted rewards:\n%s", mb_rewards)
 
         # Save frames for episode rendering
 #         if self.episode_vid_queue is not None:
@@ -336,7 +289,7 @@ class Runner(object):  # Trains workers, does actions etc and pushed clips for p
         mb_actions = mb_actions.flatten()
         mb_values = mb_values.flatten()
 #         mb_masks = mb_masks.flatten()
-        return mb_obs, mb_rewards, mb_actions, mb_values
+        return mb_obs, mb_rewards, mb_actions, mb_values, mb_states
 
 
 def learn(policy,
@@ -345,8 +298,8 @@ def learn(policy,
           start_policy_training_pipe,  
           ckpt_save_dir,
           lr_scheduler,
-          nsteps=5,
-#           nstack=4,
+          nsteps=9,
+          n_envs=8,
           total_timesteps=int(80e6),
           vf_coef=0.5,
           ent_coef=0.01,
@@ -386,8 +339,49 @@ def learn(policy,
             alpha=alpha,
             epsilon=epsilon)
 
-#     with open(osp.join(ckpt_save_dir, 'make_model.pkl'), 'wb') as fh:
-#         fh.write(cloudpickle.dumps(make_model))
+    def explained_variance(ypred,y):
+        """
+        Computes fraction of variance that ypred explains about y.
+        Returns 1 - Var[y-ypred] / Var[y]
+        interpretation:
+            ev=0  =>  might as well have predicted zero
+            ev=1  =>  perfect prediction
+            ev<0  =>  worse than just predicting zero
+        """
+        assert y.ndim == 1 and ypred.ndim == 1
+        vary = np.var(y)
+        return np.nan if vary==0 else 1 - np.var(y-ypred)/vary
+
+    def store_images(mb_states, update):
+        vector_img_1 = mb_states[0][8][:50]
+        vector_img_2 = mb_states[0][8][50:100]
+        vector_img_middle = [] 
+        int_lvl = mb_states[0][8][100]
+        if int_lvl == 0:
+            vector_img_middle = 0.7*vector_img_1 + 0.3*vector_img_2  # for slider at 0.3
+        elif int_lvl == 1:
+            vector_img_middle = 0.5*vector_img_1 + 0.5*vector_img_2
+        else:
+            vector_img_middle = 0.3*vector_img_1 + 0.7*vector_img_2
+
+        img1 = vector_to_image(vector_img_1)
+        img2 = vector_to_image(vector_img_2)
+        img_mid = vector_to_image(vector_img_middle)
+        # eight_images = [] 
+        im = Image.fromarray(np.uint8(img1))
+        im.save(str(update) + '_1.png')
+        im = Image.fromarray(np.uint8(img2))
+        im.save(str(update) + '_2.png')
+        im = Image.fromarray(np.uint8(img_mid))
+        im.save(str(update) + '_mid.png')
+
+        for i,e0_states in enumerate(mb_states):
+            assert_equal(e0_states.shape, (9, 121)) # nsteps, 121 
+            torso = e0_states[8][101:]
+            torso = np.append(torso, vector_img_middle[20:])
+            # eight_images.append(vector_to_image(torso))
+            im = Image.fromarray(np.uint8(vector_to_image(torso)))
+            im.save(str(update) + '_res_' + str(i+1) + '.png')
 
     print("Initialising policy...")
     if ckpt_load_dir is None:
@@ -435,12 +429,33 @@ def learn(policy,
 
     print("Starting policy training")
 
+    tot_plc_loss = 0
+    tot_value_loss = 0
+    tot_ev_ne = 0
+    tot_ev_po = 0
+    c = 0
+    c_ev_po = 0
+    c_ev_ne = 0
     for update in range(1, total_timesteps // nbatch + 1):
         # Run for nsteps
-        obs, states, rewards, actions, values = runner.run()
+        obs, rewards, actions, values, mb_states = runner.run()
+        if obs.shape[0] == 2:
+            continue
+        # print(rewards)
+        # break
 
         policy_loss, value_loss, policy_entropy, cur_lr = model.train(
-            obs, states, rewards, actions, values)
+            obs, rewards, actions, values)
+        ev = explained_variance(values, rewards)  ### ???
+        tot_plc_loss += policy_loss
+        tot_value_loss += value_loss
+        if ev > 0:
+            tot_ev_po += ev
+            c_ev_po += 1
+        if ev < 0:
+            tot_ev_ne += ev
+            c_ev_ne += 1
+        c += 1
 
         fps_nsteps += nbatch
 
@@ -450,16 +465,17 @@ def learn(policy,
             fps_tstart = time.time()
 
             print("Trained policy for {} time steps".format(update * nbatch))
+            store_images(mb_states, update)
 
-            ev = explained_variance(values, rewards)  ### ???
-            logger.record_tabular("nupdates", update)
-            logger.record_tabular("total_timesteps", update * nbatch)
-            logger.record_tabular("fps", fps)
-            logger.record_tabular("policy_entropy", float(policy_entropy))
-            logger.record_tabular("value_loss", float(value_loss))
-            logger.record_tabular("explained_variance", float(ev))
-            logger.record_tabular("learning_rate", cur_lr)
-            logger.dump_tabular()
+            print(tot_plc_loss / c, tot_value_loss / c, tot_ev_po / c_ev_po, tot_ev_ne / c_ev_ne)
+            tot_plc_loss = 0
+            tot_value_loss = 0
+            tot_ev_po = 0
+            tot_ev_ne = 0
+            c = 0
+            c_ev_ne = 0
+            c_ev_po = 0
+            # logger.record_tabular("nupdates", update)
 
         if update != 0 and update % ckpt_save_interval == 0:
             model.save(ckpt_save_path, update)
@@ -468,4 +484,4 @@ def learn(policy,
 
 
 from reinforcement_learning.a2c.a2c.utils import (cat_entropy, discount_with_dones,
-                           find_trainable_variables, mse, vectors_to_images)
+                           find_trainable_variables, mse, vectors_to_images, vector_to_image)

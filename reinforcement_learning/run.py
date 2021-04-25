@@ -124,7 +124,7 @@ def run(general_params,
             gen_segments=True,
             start_policy_training_pipe=start_policy_training_flag,
             seg_pipe=seg_pipe,
-            episode_vid_queue=episode_vid_queue,
+            # episode_vid_queue=episode_vid_queue,
             log_dir=general_params['log_dir'],
             a2c_params=a2c_params)
         pi, pi_proc = start_pref_interface(

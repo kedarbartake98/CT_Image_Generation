@@ -114,7 +114,7 @@
 }
 
 .sample-image-border-blue {
-    border: 7px solid #2e6da4
+    border: 7px solid rgba(223, 94, 94,0.8)
 }
 
 .submit-preferences-button {

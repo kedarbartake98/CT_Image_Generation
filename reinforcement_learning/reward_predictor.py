@@ -45,6 +45,8 @@ class RewardPredictorEnsemble:
                     dropout=dropout,
                     batchnorm=batchnorm,
                     lr=lr)
+            # Bad fix
+            self.rps = [self.rp]
             
             self.init_op = tf.compat.v1.global_variables_initializer()
 

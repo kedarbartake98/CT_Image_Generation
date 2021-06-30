@@ -17,9 +17,6 @@ import numpy as np
 import string, os
 import imageio
 
-# from utils import VideoRenderer
-
-
 class PrefInterface:
 
     def __init__(self): # synthetic_prefs ???
@@ -31,7 +28,7 @@ class PrefInterface:
 # #                                           mode=VideoRenderer.restart_on_get_mode,
 # #                                           zoom=4)
 #         else:
-#             self.renderer = None
+        self.renderer = None
         # self.synthetic_prefs = synthetic_prefs
         self.seg_idx = 0
         self.segments = []
@@ -203,15 +200,18 @@ class PrefInterface:
         """
         Sample a random pair of segments which hasn't yet been tested.
         """
-        segment_idxs_blocks = list(range(len(self.segments) / 8)) ## assert multiple of 8
+        segment_idxs_blocks = list(range(int(len(self.segments) / 8))) ## assert multiple of 8
 #         shuffle(segment_idxs)
         #choose one group of 8 ; iterate all possible combinations of that grp below
         possible_segments_blocks = combinations(segment_idxs_blocks, 1)
+
         for s in possible_segments_blocks:
-            first_seg = self.segments[s*8]
+            # print('#'*89)
+            # print(s)
+            first_seg = self.segments[s[0]*8]
             if first_seg.hash not in self.tested_segment:
                 self.tested_segment.add(first_seg.hash)
-                return s
+                return s[0]
         raise IndexError("No segment blocks yet untested")
 
     def ask_user(self, s1, s2):

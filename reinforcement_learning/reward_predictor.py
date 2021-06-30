@@ -47,7 +47,7 @@ class RewardPredictorEnsemble:
                     lr=lr)
             # Bad fix
             self.rps = [self.rp]
-            
+
             self.init_op = tf.compat.v1.global_variables_initializer()
 
             self.saver = tf.compat.v1.train.Saver(max_to_keep=1, save_relative_paths=True)
@@ -118,15 +118,10 @@ class RewardPredictorEnsemble:
         feed_dict = {}
         feed_dict[self.rp.training] = False
         feed_dict[self.rp.s1] = [obs]
-        # This will return nested lists of sizes n_preds x 1 x nsteps
-        # (x 1 because of the batch size of 1)
+        
         rs = self.sess.run(self.rp.r1, feed_dict)
-        # rs = np.array(rs)
-        # Get rid of the extra x 1 dimension
-        # rs = rs[:, 0, :]
+
         rs = np.reshape(rs, (rs.shape[1],))
-        # print(rs.shape)
-        # print(rs)
         assert_equal(rs.shape, (n_steps,))
         return rs
 

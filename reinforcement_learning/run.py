@@ -352,16 +352,6 @@ def start_reward_predictor_training(cluster_dict,
     return proc
 
 
-# def start_episode_renderer():               #Front end
-#     episode_vid_queue = Queue()
-#     renderer = VideoRenderer(
-#         episode_vid_queue,
-#         playback_speed=2,
-#         zoom=2,
-#         mode=VideoRenderer.play_through_mode)
-#     return episode_vid_queue, renderer
-
-
 if __name__ == '__main__':
     print('EXECUTING from run.main')
     main()

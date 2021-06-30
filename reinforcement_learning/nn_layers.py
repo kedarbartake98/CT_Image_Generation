@@ -12,6 +12,7 @@ def conv_layer(x, filters, kernel_size, strides, batchnorm, training, name,
         filters,
         kernel_size,
         strides,
+        padding='same',
         activation=None,
         name=name,
         reuse=reuse)
@@ -19,7 +20,7 @@ def conv_layer(x, filters, kernel_size, strides, batchnorm, training, name,
     if batchnorm:
         batchnorm_name = name + "_batchnorm"
         x = tf.compat.v1.layers.batch_normalization(
-            x, training=training, reuse=reuse, name=batchnorm_name)
+            x, training=True, reuse=reuse, name=batchnorm_name)
 
     if activation == 'relu':
         x = tf.nn.leaky_relu(x, alpha=0.01)

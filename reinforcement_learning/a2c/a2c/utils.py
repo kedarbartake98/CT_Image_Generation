@@ -4,6 +4,7 @@ import tensorflow as tf
 from collections import deque
 from scipy.interpolate import splprep, splev
 from sklearn.decomposition import PCA
+from PIL import Image
 
 
 def sample(logits):
@@ -160,32 +161,35 @@ def vectors_to_images(vectors):
     offset = 0
     new_points = []
     rew = np.ones((len(vectors),) )
-    try:
-        for org in range(6):
-            if org == 0:
-                offset += coord_nvs[org]
-                continue
-            sample_o1 = vector0[offset : offset + coord_nvs[org]]
-            sample_o2 = vector0[offset + 50: offset + coord_nvs[org]]
-            if int_level == 0:
-                sample_o = 0.7*sample_o1 + 0.3*sample_o2
-            elif int_level == 1:
-                sample_o = 0.5*sample_o1 + 0.5*sample_o2
-            else:
-                sample_o = 0.3*sample_o1 + 0.7*sample_o2
+    # try:
+    for org in range(6):
+        if org == 0:
             offset += coord_nvs[org]
-            co_in_o = coord_or[org]
-            curves_es_o = ests[org].mean_
-            for i,val in enumerate(sample_o):
-                curves_es_o = curves_es_o + ests[org].components_[i]*val
-            curves_es_o = np.reshape((curves_es_o*255.5 + 255.5), (-1, 2)).astype(int).tolist()
-            c = [curves_es_o[index][0] for index in co_in_o]
-            d = [curves_es_o[index][1] for index in co_in_o]
+            continue
+        sample_o1 = vector0[offset : offset + coord_nvs[org]]
+        sample_o2 = vector0[offset + 50: offset + 50 + coord_nvs[org]]
+        if int_lvl == 0:
+            sample_o = 0.7*sample_o1 + 0.3*sample_o2
+        elif int_lvl == 1:
+            sample_o = 0.5*sample_o1 + 0.5*sample_o2
+        else:
+            sample_o = 0.3*sample_o1 + 0.7*sample_o2
+        offset += coord_nvs[org]
+        co_in_o = coord_or[org]
+        curves_es_o = ests[org].mean_
+        for i,val in enumerate(sample_o):
+            curves_es_o = curves_es_o + ests[org].components_[i]*val
+        curves_es_o = np.reshape((curves_es_o*255.5 + 255.5), (-1, 2)).astype(int).tolist()
+        c = [curves_es_o[index][0] for index in co_in_o]
+        d = [curves_es_o[index][1] for index in co_in_o]
+        try:
             tck, _ = splprep([c, d], s=0.0, per=1)
-            new_points_o = splev(np.linspace(0, 1, 1000), tck)
-            new_points.append(new_points_o)
-    except:
-        return None, rew
+        except:
+            return np.ones((2,2)), rew
+        new_points_o = splev(np.linspace(0, 1, 1000), tck)
+        new_points.append(new_points_o)
+    # except:
+    #     return None, rew
     
     gray_values = [100, 50, 150, 200, 0]  # TODO: change values for normalization
     img = np.ones((512,512))*255
@@ -200,9 +204,14 @@ def vectors_to_images(vectors):
         img[organ[0]-1,organ[1]-1] = gray_values[ind]
         
     img = np.expand_dims(img, axis=0).repeat(len(vectors), 0)
-    c = -1
+    resized_img = None
+    co = -1
     for vector, im in zip(vectors, img):
-        c+=1
+        co = co + 1
+        if resized_img is None:
+            resized_img = np.empty(
+                shape=(img.shape[0], 256, 256)
+            )
         torso = vector[101:]
         curves_es_o = ests[0].mean_
         for i,val in enumerate(torso):
@@ -215,13 +224,61 @@ def vectors_to_images(vectors):
             new_points_o = splev(np.linspace(0, 1, 1000), tck)
             new_points_o = np.array(new_points_o).astype(int)
         except:
-            rew[c] = 0
+            rew[co] = 0
             continue
-        im[new_points_o[0],new_points_o[1]] = 230
-        im[new_points_o[0]+1,new_points_o[1]] = 230
-        im[new_points_o[0],new_points_o[1]+1] = 230
-        im[new_points_o[0]+1,new_points_o[1]+1] = 230
-        im[new_points_o[0]-1,new_points_o[1]] = 230
-        im[new_points_o[0],new_points_o[1]-1] = 230
-        im[new_points_o[0]-1,new_points_o[1]-1] = 230
-    return img, rew
+        # print(len(new_points_o))
+        try:
+            im[new_points_o[0],new_points_o[1]] = 230
+            im[new_points_o[0]+1,new_points_o[1]] = 230
+            im[new_points_o[0],new_points_o[1]+1] = 230
+            im[new_points_o[0]+1,new_points_o[1]+1] = 230
+            im[new_points_o[0]-1,new_points_o[1]] = 230
+            im[new_points_o[0],new_points_o[1]-1] = 230
+            im[new_points_o[0]-1,new_points_o[1]-1] = 230
+            img_tmp = np.array(Image.fromarray(im).resize((256, 256), resample=Image.NEAREST))
+        except:
+            rew[co] = 0
+            continue
+        resized_img[co, :, :] = img_tmp
+    return resized_img, rew
+
+def vector_to_image(vector):
+    co_in = get_first_grp_struct()
+    co_in123 = get_second_grp_struct()
+    co_in45 = get_third_grp_struct()
+    ests = load_componets()
+    coord_or = [co_in, co_in123, co_in123, co_in123, co_in45, co_in45]
+    coord_nvs = [20, 8, 8, 8, 3, 3]
+    offset = 0
+    new_points = []
+    try:
+        for org in range(6):
+            sample_o = vector[offset : offset + coord_nvs[org]]
+            offset += coord_nvs[org]
+            co_in_o = coord_or[org]
+            curves_es_o = ests[org].mean_
+            for i,val in enumerate(sample_o):
+                curves_es_o = curves_es_o + ests[org].components_[i]*val
+            curves_es_o = np.reshape((curves_es_o*255.5 + 255.5), (-1, 2)).astype(int).tolist()
+            c = [curves_es_o[index][0] for index in co_in_o]
+            d = [curves_es_o[index][1] for index in co_in_o]
+            tck, _ = splprep([c, d], s=0.0, per=1)
+            new_points_o = splev(np.linspace(0, 1, 1000), tck)
+            new_points.append(new_points_o)
+    except:
+        return None
+    
+    # gray_values = [230, 100, 50, 150, 200, 0]  # TODO: change values for normalization
+    img = np.zeros((512,512))*255
+    for ind,organ in enumerate(new_points):  # Need to be made faster / may be graphs
+        organ = np.array(organ).astype(int)
+        img[organ[0],organ[1]] = 255 # gray_values[ind]
+        # img[organ[0],organ[1]] = gray_values[ind]
+        img[organ[0]+1,organ[1]] = 255 # gray_values[ind]
+        img[organ[0],organ[1]+1] = 255 # gray_values[ind]
+        img[organ[0]+1,organ[1]+1] = 255 # gray_values[ind]
+        img[organ[0]-1,organ[1]] = 255 # gray_values[ind]
+        img[organ[0],organ[1]-1] = 255 # gray_values[ind]
+        img[organ[0]-1,organ[1]-1] = 255 # gray_values[ind]
+        
+    return img

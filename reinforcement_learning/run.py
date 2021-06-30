@@ -8,9 +8,6 @@ import cloudpickle
 import easy_tf_log
 
 from reinforcement_learning.ct_env_n import CustomEnv
-# from a2c.common import set_global_seeds
-# from a2c.common.vec_env.subproc_vec_env import SubprocVecEnv
-# from params import parse_args, PREFS_VAL_FRACTION
 from reinforcement_learning.pref_db import PrefDB, PrefBuffer
 from reinforcement_learning.pref_interface import PrefInterface
 from reinforcement_learning.reward_predictor import RewardPredictorEnsemble
@@ -370,6 +367,6 @@ if __name__ == '__main__':
     main()
 
 
-from reinforcement_learning.a2c import logger
+# from reinforcement_learning.a2c import logger
 from reinforcement_learning.a2c.a2c.a2c import learn
 from reinforcement_learning.a2c.a2c.policies import MlpPolicy

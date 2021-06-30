@@ -21,10 +21,8 @@ class RewardPredictorEnsemble:
                  lr=1e-4,
                  cluster_dict=None,
                  batchnorm=False,
-                 dropout=0.0,
-                 n_preds=1,
-                 log_dir=None):
-        self.n_preds = n_preds
+                 dropout=0.0
+                 ):
         graph, self.sess = self.init_sess(cluster_dict, cluster_job_name)
         # Why not just use soft device placement? With soft placement,
         # if we have a bug which prevents an operation being placed on the GPU
@@ -40,38 +38,23 @@ class RewardPredictorEnsemble:
             cluster=cluster_dict,
             ps_device="/job:ps/task:0",
             worker_device=worker_device)
-        self.rps = []
         with graph.as_default():
-            for pred_n in range(n_preds):
-                with tf.device(device_setter):
-                    with tf.compat.v1.variable_scope("pred_{}".format(pred_n)):
-                        rp = RewardPredictorNetwork(
-                            core_network=core_network,
-                            dropout=dropout,
-                            batchnorm=batchnorm,
-                            lr=lr)
-                self.rps.append(rp)
+            with tf.device(device_setter):
+                self.rp = RewardPredictorNetwork(
+                    core_network=core_network,
+                    dropout=dropout,
+                    batchnorm=batchnorm,
+                    lr=lr)
+            
             self.init_op = tf.compat.v1.global_variables_initializer()
-            # Why save_relative_paths=True?
-            # So that the plain-text 'checkpoint' file written uses relative paths,
-            # which seems to be needed in order to avoid confusing saver.restore()
-            # when restoring from FloydHub runs.
-            self.saver = tf.compat.v1.train.Saver(max_to_keep=1, save_relative_paths=True)
-            self.summaries = self.add_summary_ops()
 
-        self.checkpoint_file = osp.join(log_dir,
-                                        'reward_predictor_checkpoints',
-                                        'reward_predictor.ckpt')
-        self.train_writer = tf.summary.create_file_writer(
-            osp.join(log_dir, 'reward_predictor', 'train'))
-        self.test_writer = tf.summary.create_file_writer(
-            osp.join(log_dir, 'reward_predictor', 'test'))
+            self.saver = tf.compat.v1.train.Saver(max_to_keep=1, save_relative_paths=True)
+            self.saver.restore(self.sess, 'tmp/model.ckpt')
+            print('Loaded weights for rew pred correctly')
 
         self.n_steps = 0
-        self.r_norm = RunningStat(shape=n_preds)
+        self.r_norm = RunningStat(shape=1)
 
-        misc_logs_dir = osp.join(log_dir, 'reward_predictor', 'misc')
-        # easy_tf_log.set_dir(misc_logs_dir)
 
     @staticmethod
     def init_sess(cluster_dict, cluster_job_name):
@@ -131,16 +114,18 @@ class RewardPredictorEnsemble:
         assert_equal(obs.shape[1:], (256, 256))
         n_steps = obs.shape[0]
         feed_dict = {}
-        for rp in self.rps:
-            feed_dict[rp.training] = False
-            feed_dict[rp.s1] = [obs]
+        feed_dict[self.rp.training] = False
+        feed_dict[self.rp.s1] = [obs]
         # This will return nested lists of sizes n_preds x 1 x nsteps
         # (x 1 because of the batch size of 1)
-        rs = self.sess.run([rp.r1 for rp in self.rps], feed_dict)
-        rs = np.array(rs)
+        rs = self.sess.run(self.rp.r1, feed_dict)
+        # rs = np.array(rs)
         # Get rid of the extra x 1 dimension
-        rs = rs[:, 0, :]
-        assert_equal(rs.shape, (self.n_preds, n_steps))
+        # rs = rs[:, 0, :]
+        rs = np.reshape(rs, (rs.shape[1],))
+        # print(rs.shape)
+        # print(rs)
+        assert_equal(rs.shape, (n_steps,))
         return rs
 
     def reward(self, obs):
@@ -304,8 +289,8 @@ class RewardPredictorNetwork:
         # Concatenate trajectory segments so that the first dimension is just
         # frames
         # (necessary because of conv layer's requirements on input shape)
-        s1_unrolled = tf.reshape(s1, [-1, 256, 256])
-        s2_unrolled = tf.reshape(s2, [-1, 256, 256])
+        s1_unrolled = tf.reshape(s1, [-1, 256, 256, 1])
+        s2_unrolled = tf.reshape(s2, [-1, 256, 256, 1])
 
         # Predict rewards for each frame in the unrolled batch
         _r1 = core_network(

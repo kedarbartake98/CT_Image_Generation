@@ -51,9 +51,6 @@ def run(general_params,
         return RewardPredictorEnsemble(
             cluster_job_name=name,
             cluster_dict=cluster_dict,
-            log_dir=general_params['log_dir'],
-#             batchnorm=rew_pred_training_params['batchnorm'],
-#             dropout=rew_pred_training_params['dropout'],
             lr=rew_pred_training_params['lr'],
             core_network=reward_predictor_network)
 

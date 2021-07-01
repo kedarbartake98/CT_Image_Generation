@@ -1,5 +1,5 @@
 .container-fluid {
-    height: 30vh
+    height: 30%;
 }
 .slidecontainer {
     width: 100%;
@@ -43,17 +43,17 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    height:  70vh;
+    height:  70%;
+    padding-bottom: 14px;
 }
 
 .render-samples-container{
     display: flex;
     flex-direction: row;
+    width: 100vw;
     flex-wrap: wrap;
-    width: 100%;
-    height: 80%;;
+    height: 80%;
     justify-content: center;
-    padding: auto;
 }
 
 .sample-image-container {
@@ -138,7 +138,8 @@
 }
 
 .image-buttons-main-container {
-    width:25vw;
+    width:450px;
+    height: 285px;
 }
 
 .disabled-class {

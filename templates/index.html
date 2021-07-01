@@ -353,14 +353,14 @@
             if(Object.keys(this.state.data).length !== 0) this.setImages()
             let temp_samples = [1,2,3,4,5,6,7,8]
             const render_images = this.state.sampleImages.map((img_src,index) => {
-                    // Update it to temp_samples for dev if api doesn't work
+                    // Update it to temp_samples for dev if api doesn't work, this.state.sampleImages  if API works
                     return (
                         <div key={index+1} className="image-buttons-main-container">
                             {
                                 this.state.preferences.length ?
                                 <div className="sample-image-container">
                                 <img 
-                                    src= {img_src}   // update this to "/static/black_image.jpeg" for dev if api doesn't work
+                                    src={img_src} // update this to "/static/black_image.jpeg" for dev if api doesn't work, {img_src} if it does
                                     className={ this.state.preferences[index]["Accept/Reject"] === null
                                                         ? "sample-image"
                                                         :  this.state.preferences[index]["Accept/Reject"] === "1" 

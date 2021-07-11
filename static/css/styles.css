@@ -1,0 +1,148 @@
+.container-fluid {
+    height: 30%;
+}
+.slidecontainer {
+    width: 100%;
+}
+
+.slider {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 25px;
+    background: #d3d3d3;
+    outline: none;
+    opacity: 0.7;
+    -webkit-transition: .2s;
+    transition: opacity .2s;
+}
+
+.slider:hover {
+    opacity: 1;
+}
+.samples-heading {
+    height: 10%
+}
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 25px;
+    height: 25px;
+    background: #337AB7;
+    cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+    width: 25px;
+    height: 25px;
+    background: #337AB7;
+    cursor: pointer;
+}
+
+.sample-neighborhood-container {
+    background-color: #333333;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height:  70%;
+    padding-bottom: 14px;
+}
+
+.render-samples-container{
+    display: flex;
+    flex-direction: row;
+    width: 100vw;
+    flex-wrap: wrap;
+    height: 80%;
+    justify-content: center;
+}
+
+.sample-image-container {
+    display: flex;
+    flex-direction: row;
+    margin: 10px;
+    align-items: center;
+    height: calc(100% - 20px);
+}
+.organ-description {
+    padding: 5px;
+    width: 150px;
+    text-align: center;
+    color: white;
+    background-color: #595756;
+    opacity: 0.8;
+    margin-bottom: 5px;
+    font-weight: 600;
+    font-size: medium;
+    border-radius: 5px;
+}
+
+.organ-description:hover {
+    opacity: 1;
+}
+
+.organ-description-green {
+    background-color: #5cb85c;
+    border-color: #4cae4c;
+    opacity: 0.9;
+}
+
+.organ-description-red {
+    background-color:rgba(223, 94, 94,0.8);
+    opacity: 0.9;
+}
+
+.organ-description:hover {
+    cursor: pointer;
+}
+
+.organ-description-green:hover {
+    cursor: pointer;
+}
+
+.organ-description-red:hover {
+    cursor: pointer;
+}
+
+.sample-image {
+    height: calc(100% - 20px);
+    width: 250px;
+    margin-right: 10px;
+}
+
+.sample-image-border-green {
+    border: 7px solid #5cb85c;
+}
+
+.sample-image-border-blue {
+    border: 7px solid rgba(223, 94, 94,0.8)
+}
+
+.submit-preferences-button {
+    padding: 15px;
+    color: #fff;
+    background-color: #337ab7;
+    border-color: #2e6da4;
+    font-weight: 600;
+    font-size: large;
+    align-self: center;
+    margin-right: 20px;
+}
+.submit-preferences-button:hover {
+    background-color: #0077b6;
+}
+.buttons-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    height: 10%;
+}
+
+.image-buttons-main-container {
+    width:450px;
+    height: 285px;
+}
+
+.disabled-class {
+    pointer-events: none;
+    opacity: 0.6;
+}

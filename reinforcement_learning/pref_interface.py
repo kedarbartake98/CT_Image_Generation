@@ -20,14 +20,6 @@ import imageio
 class PrefInterface:
 
     def __init__(self): # synthetic_prefs ???
-#         self.vid_q = Queue()
-#         if not synthetic_prefs:
-#             pass
-#             ### start your custom interface 
-# #             self.renderer = VideoRenderer(vid_queue=self.vid_q,
-# #                                           mode=VideoRenderer.restart_on_get_mode,
-# #                                           zoom=4)
-#         else:
         self.renderer = None
         # self.synthetic_prefs = synthetic_prefs
         self.seg_idx = 0
@@ -43,8 +35,8 @@ class PrefInterface:
     def run(self, seg_pipe, pref_pipe, path_pipe):
         while len(self.segments) < 8: #2: receive 8 segements at a time
             print("Preference interface waiting for segments")
-            print("Preference interface waiting for segments")
-            print("Preference interface waiting for segments")
+            # print("Preference interface waiting for segments")
+            # print("Preference interface waiting for segments")
             print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
             print(len(self.segments))
             time.sleep(5.0)
@@ -53,11 +45,11 @@ class PrefInterface:
         print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA2")
         print("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA2")
         print(len(self.segments))
-        print(self.segments[0].frames[24])
-        print(self.segments[1].frames[24])
-        print(self.segments[2].frames[24])
-        print(self.segments[3].frames[24])
-        print(self.segments[7].frames[24])
+        # print(self.segments[0].frames[24])
+        # print(self.segments[1].frames[24])
+        # print(self.segments[2].frames[24])
+        # print(self.segments[3].frames[24])
+        # print(self.segments[7].frames[24])
         # print(len(self.segments[0].frames))
         vector_img_1 = self.segments[0].frames[24][:50]
         vector_img_2 = self.segments[0].frames[24][50:100]
@@ -145,22 +137,18 @@ class PrefInterface:
                 ### write code for identifying a pref for s1, s2
                 if (s1.better_than_linear and not s2.better_than_linear) or \
                     (not s1.worse_torso and s2.worse_torso):
+                    print('$'*100)
+                    print('Setting 1-0 Pref')
                     pref = (1.0, 0.0)
                 elif (not s1.better_than_linear and s2.better_than_linear) or \
                     (s1.worse_torso and not s2.worse_torso):
+                    print('$'*100)
+                    print('Setting 0-1 Pref')
                     pref = (0.0, 1.0)
                 else:
+                    print('$'*100)
+                    print('Setting Default Pref')
                     pref = (0.5, 0.5)
-
-#             if not self.synthetic_prefs:
-#                 pref = self.ask_user(s1, s2)
-#             else:
-#                 if sum(s1.rewards) > sum(s2.rewards):
-#                     pref = (1.0, 0.0)
-#                 elif sum(s1.rewards) < sum(s2.rewards):
-#                     pref = (0.0, 1.0)
-#                 else:
-#                     pref = (0.5, 0.5)
 
             if pref is not None:
                 # We don't need the rewards from this point on, so just send
@@ -175,16 +163,16 @@ class PrefInterface:
         """
         Receive segments from `seg_pipe` into circular buffer `segments`.
         """
-        max_wait_seconds = 0.5
+        max_wait_seconds = 5
         start_time = time.time()
         n_recvd = 0
         while time.time() - start_time < max_wait_seconds:
             try:
                 segment = seg_pipe.get(block=True, timeout=max_wait_seconds)
-                # print(len(segment.rewards))
-                # print(len(segment.frames))
-                # print(smfls)
+
             except queue.Empty:
+                print('$'*100)
+                print('No segments before timeout. Exiting')
                 return
             if len(self.segments) < 20000: #self.max_segs:
                 self.segments.append(segment)
@@ -192,9 +180,6 @@ class PrefInterface:
                 self.segments[self.seg_idx] = segment
                 self.seg_idx = (self.seg_idx + 1) % self.max_segs
             n_recvd += 1
-        # easy_tf_log.tflog('segment_idx', self.seg_idx)
-        # easy_tf_log.tflog('n_segments_rcvd', n_recvd)
-        # easy_tf_log.tflog('n_segments', len(self.segments))
 
     def sample_seg_eight(self):
         """
@@ -213,43 +198,3 @@ class PrefInterface:
                 self.tested_segment.add(first_seg.hash)
                 return s[0]
         raise IndexError("No segment blocks yet untested")
-
-    def ask_user(self, s1, s2):
-        vid = []
-        seg_len = len(s1)
-        for t in range(seg_len):
-            border = np.zeros((84, 10), dtype=np.uint8)
-            # -1 => show only the most recent frame of the 4-frame stack
-            frame = np.hstack((s1.frames[t][:, :, -1],
-                               border,
-                               s2.frames[t][:, :, -1]))
-            vid.append(frame)
-        n_pause_frames = 7
-        for _ in range(n_pause_frames):
-            vid.append(np.copy(vid[-1]))
-        self.vid_q.put(vid)
-
-        while True:
-            print("Segments {} and {}: ".format(s1.hash, s2.hash))
-            choice = input()
-            # L = "I prefer the left segment"
-            # R = "I prefer the right segment"
-            # E = "I don't have a clear preference between the two segments"
-            # "" = "The segments are incomparable"
-            if choice == "L" or choice == "R" or choice == "E" or choice == "":
-                break
-            else:
-                print("Invalid choice '{}'".format(choice))
-
-        if choice == "L":
-            pref = (1.0, 0.0)
-        elif choice == "R":
-            pref = (0.0, 1.0)
-        elif choice == "E":
-            pref = (0.5, 0.5)
-        elif choice == "":
-            pref = None
-
-        self.vid_q.put([np.zeros(vid[0].shape, dtype=np.uint8)])
-
-        return pref

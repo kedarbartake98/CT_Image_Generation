@@ -13,7 +13,7 @@ import sys
 import numpy as np
 import cv2
 
-def get_prefs_from_frontend(pref_dicts, pref_pipe):
+def get_prefs_from_frontend(pref_dicts, pref_pipe, pref_db_pipe):
     '''
     Process dict/list of dicts received from frontend and put it in relevant 
     pipes/queues according to need

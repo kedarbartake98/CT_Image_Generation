@@ -12,8 +12,6 @@ import cv2
 from reinforcement_learning import run, a2c
 from rl_init_params import init_arg_tuple
 
-from client_server_comm import *
-
 app = Flask(__name__)
 
 @app.route('/')
@@ -47,8 +45,16 @@ def get_segments():
 def submit_prefs():
     pref_dict = request.form['preferences']
     preferences = json.loads(pref_dict)
-    get_prefs_from_frontend(preferences, pref_pipe, pref_db_pipe)
-    return {"Done": "Done"}
+
+    while True:
+        try:
+            pref_db_pipe.put(preferences, block=True)
+            return {"Done": "Done"}
+
+        except queue.Full:
+            print('Pref_db queue full..')
+            time.sleep(2)
+            pass
 
 ############################## Backend Code #################################### 
 

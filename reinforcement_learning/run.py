@@ -39,9 +39,9 @@ def run(general_params,
         seg_pipe,
         pref_pipe,
         path_pipe,
+        pref_db_pipe,
         start_policy_training_flag):
 
-    ## TODO Arjun - initialize reward pred network -- DONE
     reward_predictor_network = net_cnn
 
     def make_reward_predictor(name, cluster_dict):
@@ -55,23 +55,21 @@ def run(general_params,
                                make_reward_predictor)
     
     if general_params['mode'] == 'gather_initial_prefs':
-        cluster_dict = create_cluster_dict(['a2c'])   ### ??? ERROR
-#         ps_proc = start_parameter_server(cluster_dict, make_reward_predictor)  # this needs to be commented out
+        cluster_dict = create_cluster_dict(['a2c'])  
         env, a2c_proc = start_policy_training(
             cluster_dict=cluster_dict,
-            make_reward_predictor=make_reward_predictor,  # since reward pred is used to get rewards
+            make_reward_predictor=make_reward_predictor, 
             gen_segments=True,
             start_policy_training_pipe=start_policy_training_flag,
             seg_pipe=seg_pipe,
-#             episode_vid_queue=episode_vid_queue,
             log_dir=general_params['log_dir'],
             a2c_params=a2c_params)
-        pi, pi_proc = start_pref_interface(   # gather preferences through interface
+        pi, pi_proc = start_pref_interface(
             seg_pipe=seg_pipe,
             pref_pipe=pref_pipe,
             path_pipe=path_pipe,
-            log_dir=general_params['log_dir'])#,
-            # **pref_interface_params)
+            pref_db_pipe=pref_db_pipe,
+            log_dir=general_params['log_dir'])
 
         n_train = general_params['max_prefs'] * (1 - PREFS_VAL_FRACTION)
         n_val = general_params['max_prefs'] * PREFS_VAL_FRACTION
@@ -90,6 +88,7 @@ def run(general_params,
         pref_buffer.stop_recv_thread()
 
         env.close()
+
     elif general_params['mode'] == 'just_train_reward_predictor':     #no front end
         cluster_dict = create_cluster_dict(['ps', 'train'])
         ps_proc = start_parameter_server(cluster_dict, make_reward_predictor)
@@ -109,6 +108,7 @@ def run(general_params,
             log_dir=general_params['log_dir'])
         rpt_proc.join()
         ps_proc.terminate()
+
     elif general_params['mode'] == 'train_policy_with_preferences':  #everything
         cluster_dict = create_cluster_dict(['ps', 'a2c', 'train'])
         ps_proc = start_parameter_server(cluster_dict, make_reward_predictor)
@@ -186,18 +186,6 @@ def configure_a2c_logger(log_dir):
     logger.Logger.CURRENT = logger.Logger(dir=a2c_dir, output_formats=[tb])
 
 
-# def make_envs(n_envs):
-# #     def wrap_make_env(env_id, rank):
-# #         def _thunk():
-# #             return make_env(env_id, seed + rank)
-# #         return _thunk
-# # #     set_global_seeds(seed)
-# #     env = SubprocVecEnv(env_id, [wrap_make_env(env_id, i)
-# #                                  for i in range(n_envs)])
-#     env = CustomEnv(n_envs)
-#     return env
-
-
 def start_parameter_server(cluster_dict, make_reward_predictor):
     def f():
         make_reward_predictor('ps', cluster_dict)
@@ -256,7 +244,7 @@ def start_policy_training(cluster_dict, make_reward_predictor, gen_segments,
     return env, proc
 
 
-def start_pref_interface(seg_pipe, pref_pipe, path_pipe,
+def start_pref_interface(seg_pipe, pref_pipe, path_pipe, pref_db_pipe,
                          log_dir):
     def f():
         # The preference interface needs to get input from stdin. stdin is
@@ -265,7 +253,8 @@ def start_pref_interface(seg_pipe, pref_pipe, path_pipe,
         sys.stdin = os.fdopen(0)
         print('PREF')
         # print(PREF)
-        pi.run(seg_pipe=seg_pipe, pref_pipe=pref_pipe, path_pipe=path_pipe)
+        pi.run(seg_pipe=seg_pipe, pref_pipe=pref_pipe, path_pipe=path_pipe,
+               pref_db_pipe=pref_db_pipe)
 
     # Needs to be done in the main process because does GUI setup work
     prefs_log_dir = osp.join(log_dir, 'pref_interface')

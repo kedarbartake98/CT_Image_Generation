@@ -57,11 +57,14 @@ def initialize_comms():
     Initialize global queues for communication between frontend and backend
     processes.
     '''
+    # Backend components comm pipes
     seg_pipe = Queue(maxsize=8)
     pref_pipe = Queue(maxsize=8)
-    path_pipe = Queue(maxsize=8)
-    pref_db_pipe = Queue(maxsize=8)
     start_policy_training_flag = Queue(maxsize=8)
+
+    # frontend backend comm pipes
+    path_pipe = Queue(maxsize=1)
+    pref_db_pipe = Queue(maxsize=1)
 
     return seg_pipe, pref_pipe, start_policy_training_flag, \
            path_pipe, pref_db_pipe
@@ -77,8 +80,8 @@ def start_backend(init_arg_tuple, comm_pipes):
     path_pipe, pref_db_pipe = comm_pipes
 
     run(general_params, a2c_params, pref_interface_params, 
-        rew_pred_training_params, seg_pipe, pref_pipe, path_pipe, 
-        start_policy_training_flag)
+        rew_pred_training_params, seg_pipe, pref_pipe, path_pipe,
+        pref_db_pipe, start_policy_training_flag)
 
 ################################################################################
 

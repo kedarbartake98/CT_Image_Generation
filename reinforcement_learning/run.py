@@ -73,6 +73,8 @@ def run(general_params,
 
         n_train = general_params['max_prefs'] * (1 - PREFS_VAL_FRACTION)
         n_val = general_params['max_prefs'] * PREFS_VAL_FRACTION
+
+        print('Train db len : {}'.format(n_train))
         pref_db_train = PrefDB(maxlen=n_train)
         pref_db_val = PrefDB(maxlen=n_val)
         pref_buffer = PrefBuffer(db_train=pref_db_train, db_val=pref_db_val)
@@ -83,7 +85,6 @@ def run(general_params,
         save_prefs(general_params['log_dir'], pref_db_train, pref_db_val)
 
         pi_proc.terminate()
-        pi.stop_renderer()
         a2c_proc.terminate()
         pref_buffer.stop_recv_thread()
 

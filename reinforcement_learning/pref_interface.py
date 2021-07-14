@@ -28,6 +28,7 @@ class PrefInterface:
 
             # Initialize segment block
             self.seg_block = []
+            self.seg_pairs = set()
             # Collect 8 segments
             self.recv_segments(seg_pipe)
 
@@ -173,24 +174,39 @@ class PrefInterface:
         possible_pairs = combinations(segment_idxs, 2)
 
         for i1, i2 in possible_pairs:
-            s1, s2 = self.seg_block[i1], self.seg_block[i2]
-            ### write code for identifying a pref for s1, s2
-            if (s1.better_than_linear and not s2.better_than_linear) or \
-                (not s1.worse_torso and s2.worse_torso):
-                print('$'*100)
-                print('Setting 1-0 Pref')
-                pref = (1.0, 0.0)
-            elif (not s1.better_than_linear and s2.better_than_linear) or \
-                (s1.worse_torso and not s2.worse_torso):
-                print('$'*100)
-                print('Setting 0-1 Pref')
-                pref = (0.0, 1.0)
-            else:
-                print('$'*100)
-                print('Setting Default Pref')
-                pref = (0.5, 0.5)
 
-        if pref is not None:
-            # We don't need the rewards from this point on, so just send
-            # the frames  ###? because the rewards are known by reward classifier???
-            pref_pipe.put((s1.frames, s2.frames, pref))
+            if not (i1,i2) in self.seg_pairs: 
+                
+                self.seg_pairs.add((i1,i2))
+                self.seg_pairs.add((i2,i1))
+                
+                s1, s2 = self.seg_block[i1], self.seg_block[i2]
+                ### write code for identifying a pref for s1, s2
+                if (s1.better_than_linear and not s2.better_than_linear) or \
+                    (not s1.worse_torso and s2.worse_torso):
+                    print('$'*100)
+                    print('Setting 1-0 Pref')
+                    pref = (1.0, 0.0)
+                elif (not s1.better_than_linear and s2.better_than_linear) or \
+                    (s1.worse_torso and not s2.worse_torso):
+                    print('$'*100)
+                    print('Setting 0-1 Pref')
+                    pref = (0.0, 1.0)
+                else:
+                    print('$'*100)
+                    print('Setting Default Pref')
+                    pref = (0.5, 0.5)
+
+                if pref is not None:
+                    # We don't need the rewards from this point on, so just send
+                    # the frames  ###? because the rewards are known by reward classifier???
+                    while True:
+                        try:
+                            pref_pipe.put((s1.frames, s2.frames, pref))
+                            break
+                        except queue.Full:
+                            time.sleep(0.5)
+                            continue
+
+            else:
+                print('Prev pair')

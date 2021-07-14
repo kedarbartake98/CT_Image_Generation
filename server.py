@@ -65,7 +65,7 @@ def initialize_comms():
     '''
     # Backend components comm pipes
     seg_pipe = Queue(maxsize=8)
-    pref_pipe = Queue(maxsize=8)
+    pref_pipe = Queue(maxsize=1)
     start_policy_training_flag = Queue(maxsize=8)
 
     # frontend backend comm pipes

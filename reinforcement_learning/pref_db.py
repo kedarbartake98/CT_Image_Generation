@@ -157,6 +157,7 @@ class PrefBuffer:
             except queue.Empty:
                 continue
             n_recvd += 1
+            print('N_recvd {}'.format(n_recvd))
 
             val_fraction = self.val_db.maxlen / (self.val_db.maxlen +
                                                  self.train_db.maxlen)
@@ -164,10 +165,9 @@ class PrefBuffer:
             self.lock.acquire(blocking=True)
             if np.random.rand() < val_fraction:
                 self.val_db.append(s1, s2, pref)
-                # easy_tf_log.tflog('val_db_len', len(self.val_db))
             else:
+                print('Adding to train db')
                 self.train_db.append(s1, s2, pref)
-                # easy_tf_log.tflog('train_db_len', len(self.train_db))
             self.lock.release()
 
             # easy_tf_log.tflog('n_prefs_recvd', n_recvd)
@@ -192,6 +192,7 @@ class PrefBuffer:
             val_len = len(self.val_db)
             self.lock.release()
             if train_len >= min_len and val_len != 0:
+                print('Max length of db reached.. exiting')
                 break
             print("Waiting for preferences; {} so far".format(train_len))
             time.sleep(5.0)

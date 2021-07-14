@@ -12,7 +12,7 @@ general_args = {
 	'mode': 'gather_initial_prefs',
 	'log_dir': 'logs',
 	'max_prefs': 20000,
-	'n_initial_prefs': 8
+	'n_initial_prefs': 20000
 }
 
 pref_interface_args = {
